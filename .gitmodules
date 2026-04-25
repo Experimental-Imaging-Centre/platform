@@ -1,0 +1,3 @@
+[submodule "roles/mambaorg.micromamba"]
+	path = roles/mambaorg.micromamba
+	url = https://github.com/mamba-org/ansible-role-micromamba.git
