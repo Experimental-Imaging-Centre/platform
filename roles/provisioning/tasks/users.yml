@@ -1,0 +1,9 @@
+--- # Create users
+
+- name: "Add the local user owner of software: {{ software_user }}"
+  ansible.builtin.user:
+    name: "{{ software_user }}"
+    comment: "EIC software"
+    home: "/home/{{ software_user }}"
+    shell: /bin/bash
+    state: present

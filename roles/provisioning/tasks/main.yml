@@ -1,0 +1,9 @@
+---
+
+- {import_tasks: users.yml, tags: users}
+- {import_tasks: dirs.yml, tags: dirs}
+- {import_tasks: packagemanager.yml, tags: packagemanager}
+- {import_tasks: micromamba.yml, tags: micromamba}
+- {import_tasks: packages.yml, tags: packages}
+
+

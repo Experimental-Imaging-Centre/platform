@@ -1,0 +1,22 @@
+--- # Install global packages
+
+# Update apt
+- name: Install global packages through apt
+  ansible.builtin.apt:
+    update_cache: yes
+    state: latest
+    autoclean: yes
+    autoremove: yes
+    pkg:
+      - automake
+      - bc
+      - build-essential
+      - cmake
+      - curl
+      - g++
+      - gfortran
+      - git
+      - gsl-bin
+      - pipx
+      - python3
+      - python3-pip

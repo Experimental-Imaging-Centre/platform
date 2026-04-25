@@ -1,0 +1,32 @@
+--- # Create directories
+
+# Setup initial directories
+- name: Create required directories for software
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ software_user }}"
+    group: "{{ software_user }}"
+    mode: u=rwx,g=rx,o=rx
+  loop:
+    - "{{ environments_path }}/global"
+    - "{{ environments_path }}/standard"
+    - "{{ environments_path }}/dependencies"
+    - "{{ environments_path }}/modulefiles"
+    - "{{ local_path }}/software"
+    - "{{ local_path }}/modulefiles"
+    - "{{ pipelines_path }}/software"
+    - "{{ pipelines_path }}/modulefiles"
+    - "{{ quarantine_path }}/resources"
+    - "{{ quarantine_path }}/software"
+    - "{{ quarantine_path }}/modulefiles"
+    - "{{ share_path }}/software"
+    - "{{ share_path }}/modulefiles"
+
+# Install lmod
+
+# Config lmod
+
+# Export paths
+# - LOCAL_PATH, PIPELINES_PATH, ENVIRONMENTS_PATH, QUARANTINE_PATH
+# - EIC_COMMON, EIC_PROJECTS, EIC_HOME

@@ -1,0 +1,31 @@
+--- # Update package manager cache
+
+# Update apt
+- name: Update apt
+  ansible.builtin.apt:
+    update_cache: yes
+    state: latest
+    autoclean: yes
+    autoremove: yes
+
+- name: Upgrade (safe)
+  ansible.builtin.apt:
+    update_cache: yes
+    state: latest
+    autoclean: yes
+    autoremove: yes
+    upgrade: safe
+  tags:
+    - never
+    - system_upgrade
+
+- name: Upgrade (distribution upgrade)
+  ansible.builtin.apt:
+    update_cache: yes
+    state: latest
+    autoclean: yes
+    autoremove: yes
+    upgrade: dist
+  tags:
+    - never
+    - system_distupgrade
