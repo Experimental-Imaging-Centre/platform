@@ -1,0 +1,103 @@
+---
+##################################################################################
+# Pycharm
+##################################################################################
+
+# Get vars from roles' vars/ directory
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ pycharm.package }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.name }}"
+    package_version: "{{ package.version }}"
+    package_arch: "{{ package.arch }}"
+    package_os: "{{ package.os }}"
+    package_base_url: "{{ package.base_url }}"
+    package_checksum: "{{ package.checksum }}"
+    base_path: "{{ local_path }}/software/{{ package.name }}/{{ package.version }}"
+
+- name: Set download link (no arch)
+  ansible.builtin.set_fact:
+    package_url: "{{ package_base_url }}/pycharm-{{ package_version }}.tar.gz"
+  when: package_arch | default('') | length == 0
+
+- name: Set download link (with arch)
+  ansible.builtin.set_fact:
+    package_url: "{{ package_base_url }}/pycharm-{{ package_version }}-{{ package_arch}}.tar.gz"
+  when: package_arch | default('') | length > 0
+
+- name: Create temporary directory to download package archive
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: build
+  register: temp_dir
+
+- name: Download the package archive with SHA256 verification
+  ansible.builtin.get_url:
+    url: "{{ package_url }}"
+    dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
+    checksum: "{{ package_checksum }}"
+
+- name: Create package install location
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ software_user }}"
+    mode: u=rwX,g=rX,o=rX
+  loop:
+    - "{{ base_path }}/install"
+
+- name: Extract and install the package
+  ansible.builtin.unarchive:
+    src: "{{ temp_dir.path }}/{{ package_url | basename }}"
+    dest: "{{ base_path }}/install"
+    creates: "{{ base_path }}/install/bin/pycharm"
+    owner: "{{ software_user }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1,--no-same-owner]
+
+- name: Cleanup temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+
+- name: Install module
+  template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package_name }}'"
+          - module_version: "'{{ package_version }}'"
+          - module_description: "'IDE for the Python programming language'"
+          - module_help: {"[[ PyCharm is an IDE for the Python programming language. ]]" : str}
+        funcs:
+          - whatis: ["Name" : str, module_name]
+          - whatis: ["Version" : str, module_version]
+          - whatis: ["Description" : str, module_description]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ local_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    mode: '0755'
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    state: link

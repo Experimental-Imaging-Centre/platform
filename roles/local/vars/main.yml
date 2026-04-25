@@ -1,0 +1,48 @@
+---
+
+############################
+# Latest package definitions
+############################
+
+rstudio:
+  package:
+    name: "rstudio"
+    version: "2026.04.0-526"
+    arch: "amd64"
+    os: "debian"
+    target: "jammy"
+    base_url: "https://download1.rstudio.org/electron"
+    checksum: "sha256:d2f6892cce4b4b894b7cfc7847e0e1ecfc31d9946ac7a5925c3584f49ccfd57b"
+
+spyder:
+  package:
+    name: "spyder"
+    version: "6.1.4"
+    arch: "x86_64"
+    os: "Linux"
+    base_url: "https://github.com/spyder-ide/spyder/releases/download"
+    checksum: "sha256:3cbb6e9c78a48e316c792fc2aca7bb3acf0d23d2f9b0315c73aee123dff2acda"
+
+pycharm:
+  package:
+    name: "pycharm"
+    version: "2026.1"
+    arch: ""
+    os: "Linux"
+    base_url: "https://download.jetbrains.com/python"
+    checksum: "sha256:6405985fe82bc6a419005388930cbe318b7419b82cb09c8494035a2be8511b0f"
+
+
+############################
+# Old package definitions
+############################
+
+"rstudio_2026.01.1-403":
+  package:
+    name: "rstudio"
+    version: "2026.01.1-403"
+    arch: "amd64"
+    os: "debian"
+    target: "jammy"
+    base_url: "https://download1.rstudio.org/electron"
+    checksum: "sha256:b1684c4368f510b3ddb65f692b30f3352bbef9d5c25aa67cf461341c811923aa"
