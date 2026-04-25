@@ -1,0 +1,211 @@
+--- # globalenv
+
+####################################
+# Get version
+- name: New version name
+  ansible.builtin.set_fact:
+    environment_name: "globalenv"
+    environment_version: "2026-04-17" #"{{ ansible_date_time.date }}"
+  tags: always
+
+# Get environment path
+# Separate task from set_fact above since it relies on variables that are set at the end of that call
+- name: Defining environment path
+  ansible.builtin.set_fact:
+    base_path: "{{ environments_path }}/global/{{ environment_name }}/{{ environment_version }}"
+    thisenv_path: "{{ environments_path }}/global/{{ environment_name }}/{{ environment_version }}/env"
+  tags: always
+
+# Setup initial directories
+- name: Create required directories
+  become_user: root
+  ansible.builtin.file:
+    path: "{{ base_path }}"
+    state: directory
+    owner: "{{ software_user }}"
+    group: root
+    mode: u=rwx,g=rx,o=rx
+
+# Copy environment file
+- name: Copying environment file
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ base_path }}/"
+  with_fileglob:
+    - "files/{{ environment_name }}-*.yml"
+
+- name: Check micromamba info
+  ansible.builtin.shell: |
+    export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+    source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+    mamba info
+  register: debug_out
+
+- name: Print micromamba info
+  ansible.builtin.debug:
+    var: debug_out.stdout_lines
+
+# Create Conda environment
+- name: Create environment
+  ansible.builtin.shell: |
+    export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+    source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+    mamba create --quiet --yes -p "{{ thisenv_path }}" -f "{{ base_path }}/{{ environment_name }}-conda.yml"
+  args:
+    creates: "{{ thisenv_path }}"
+  tags:
+    - conda
+    - trusted
+
+# Copy R package installer
+# - name: Copying R package installer into environment
+#   ansible.builtin.template:
+#     src: Rinstpkg
+#     dest: "{{ thisenv_path }}/bin"
+#
+# ####################################
+# # Install non-conda packages (trusted)
+# - name: Load extra package list
+#   ansible.builtin.include_vars:
+#     file: "{{ base_path }}/{{ environment_name }}-pkgspec.yml"
+#
+# # Pip - trusted packages
+# - name: Install trusted pip packages
+#   ansible.builtin.pip:
+#     name: "{{ item }}"
+#     state: present
+#     executable: "{{ thisenv_path }}/bin/pip"
+#   loop: "{{ standard.trusted.source.pip }}"
+#   when: standard.trusted.source.pip is defined
+#   tags:
+#     - pip
+#     - trusted
+#
+# - name: Install trusted pip packages without dependencies
+#   ansible.builtin.pip:
+#     name: "{{ item }}"
+#     state: present
+#     executable: "{{ thisenv_path }}/bin/pip"
+#     extra_args: "--no-deps"
+#   loop: "{{ standard.trusted.source.pip_no_deps }}"
+#   when: standard.trusted.source.pip_no_deps is defined
+#   tags:
+#     - pip
+#     - trusted
+#
+# # CRAN - trusted packages
+# - name: Install trusted CRAN packages
+#   command: {{ environments_path }}/global/{{ environment_name }}/{{ environment_version }}/env/bin/Rscript --vanilla -e "if (! ('{{ item }}' %in% installed.packages()[,'Package'])) install.packages('{{ item }}', repos=c('https://cran.rstudio.com/'))"
+#   loop: "{{ standard.trusted.source.cran }}"
+#   tags:
+#     - cran
+#     - trusted
+#
+# # Bioconductor - trusted packages
+#
+#
+# # GitHub - trusted packages
+#
+#
+# # GitLab - trusted packages
+#
+#
+# ####################################
+# # Install non-conda packages (unverified)
+#
+# # CRAN - unverified packages
+#
+#
+# # Bioconductor - unverified packages
+#
+#
+# # GitHub - unverified packages
+#
+#
+# # GitLab - unverified packages
+#
+#
+# ####################################
+# # Install special packages
+# # when special environment variables are defined
+#
+# # CRAN - special packages
+#
+#
+# # Bioconductor - special packages
+#
+#
+# # GitHub - special packages
+#
+#
+# # GitLab - special packages
+#
+#
+#
+
+# # Install module
+# #- name: Install module
+# # - add env/bin/R to RSTUDIO_WHICH_R
+# # - add env/lib/R/lib to LD_LIBRARY_PATH
+# #  tags: module
+#
+# # Add shared package cache to user
+#
+# # Link modules
+- name: Install module
+  template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+            - module_name: "'{{ environment_name }}'"
+            - module_version: "'{{ environment_version }}'"
+            - module_description: "'Global analysis environment'"
+            - module_help: {"[[ A global environment for analysis containing a wide range of Python and R packages ]]" : str}
+        funcs:
+          - whatis: ["Name" : str, module_name]
+          - whatis: ["Version" : str, module_version]
+          - whatis: ["Description" : str, module_description]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+            - family: [ "condaenv" : quote ]
+            - conflict: [ module_name ]
+      requires:
+        category: "Requires"
+        funcs:
+          - depends_on: [ "'micromamba'" ]
+      environment:
+        category: "Environment"
+        funcs:
+          - pushenv: [ "'RSTUDIO_WHICH_R'" , "'{{ thisenv_path }}/bin/R'" ]
+          - pushenv: [ "'LD_LIBRARY_PATH'" , "'{{ thisenv_path }}/lib/R/lib'" ]
+          - pushenv: [ "'R_LIBS_SITE'" , "'{{ thisenv_path }}/lib/R/library'" ]
+        cmds:
+          - |
+            execute {
+                cmd = "micromamba activate " .. "{{ thisenv_path }}",
+                modeA = {"load"}
+            }
+          - |
+            execute {
+                cmd = "micromamba deactivate",
+                modeA = {"unload"}
+            }
+
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ environments_path }}/modulefiles/global/{{ environment_name }}/"
+    state: directory
+    mode: '0755'
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ environments_path }}/modulefiles/global/{{ environment_name }}/{{ environment_version }}.lua"
+    state: link

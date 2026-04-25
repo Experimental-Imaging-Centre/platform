@@ -1,0 +1,466 @@
+---
+
+name: globalenv
+standard:
+  trusted:
+    source:
+      pip:
+      # Numerics
+        - jax
+        - jaxlib
+      # Neuroimaging
+        - abagen
+        - allensdk
+        - asltk
+        - brainstat
+        - neurosynth
+        - neuroquery
+        - nimagen
+        - nimare
+        - pcntoolkit
+        - pyminc
+      # MRI
+        - brkraw
+        - brkraw-dti
+        - brkraw-mrs
+        - brkraw-sordino
+        - brkraw-viewer
+        - cmrsim
+      # Stats
+        - group-lasso
+        - lassonet
+        - opnmf
+      # Data mining
+        - pubget
+      # Visualization
+        - lets-plot
+        - plotnine3d
+      # GUI
+        - pyqt5-tools
+      # External services
+        - mattermost
+        - mattermost-notify
+        - pydo
+      # Domain specific
+        - particle
+      pip_no_deps:
+      # Image processing
+        - itk-vtkglue
+      cran:
+      # Numerics
+        - AMCMC
+        - fmcmc
+        - RcppHungarian
+        - sparsegl
+      # Image processing
+        - geomorph
+        - ICvectorfields
+        - morph
+      # Distributed data
+        - distcomp
+      # Processing and imputation
+        - EpiEstim
+        - imputeTS
+      # Stats distributions and testing
+        - ppsr
+        - stability
+      # Model fitting and optimization
+        - calibrar
+        - fitlandr
+        - lglasso
+        - LassoNet
+        - moderndive
+        - pso
+        - rBayesianOptimization
+      # Imaging
+        - brainGraph
+        - fmri
+        - fsbrain
+        - fslr
+        - neuroim2
+        - oro.dicom
+        - oro.nifti
+        - RNifti
+      # Topological data analysis
+        - inphr
+        - phutil
+        - rgph
+        - ripserr
+        - tdarec
+        - TDAstats
+        - tdaunif
+      # Plotting - specific types
+        - autograph
+        - easyalluvial
+        - effectplots
+        - likert
+        - lindia
+        - metrica
+        - parttree
+        - plotthis
+        - qbinplots
+        - rfviz
+        - smplot2
+        - splineplot
+        - swimplot
+        - vismi
+      # Plotting - ggplot extensions
+        - biscale
+        - canadamaps
+        - canadianmaps
+        - edgebundle
+        - flowmapper
+        - FunnelPlotR
+        - gaussplotR
+        - gg1d
+        - ggalignment
+        - ggarchery
+        - ggarrow
+        - ggautomap
+        - ggbrace
+        - ggbrain
+        - ggbrick
+        - ggchord
+        - ggcompare
+        - ggcorrheatmap
+        - ggdaynight
+        - ggdiagram
+        - ggdibbler
+        - ggdiceplot
+        - ggDNAvis
+        - ggDoE
+        - ggDoubleHeat
+        - ggEDA
+        - ggfacto
+        - ggfields
+        - ggfixest
+        - ggfoundry
+        - gggda
+        - ggguides
+        - gghexsize
+        - gghourglass
+        - ggimg
+        - ggincerta
+        - ggip
+        - ggisotonic
+        - gglinedensity
+        - gglm
+        - gglogger
+        - gglorenz
+        - gglyph
+        - ggmapcn
+        - ggmapinset
+        - ggmugs
+        - ggnuplot
+        - ggOceanMaps
+        - ggordiplots
+        - ggpath
+        - ggpca
+        - ggpcp
+        - ggpedigree
+        - ggperiodic
+        - ggpicrust2
+        - ggpolar
+        - ggQQunif
+        - ggquiver
+        - ggrain
+        - ggrecipes
+        - ggredist
+        - ggreveal
+        - ggrounded
+        - ggsankeyfier
+        - ggScatRidges
+        - ggsced
+        - ggseg
+        - ggsegmentedtotalbar
+        - ggsem
+        - ggshadow
+        - ggskewboxplots
+        - ggsky
+        - ggsmc
+        - ggspark
+        - ggstackplot
+        - ggsurveillance
+        - ggswissmaps
+        - ggtaxplot
+        - ggtibble
+        - ggtikz
+        - ggtrace
+        - ggtranslate
+        - ggtreebar
+        - ggtrendline
+        - ggtricks
+        - ggvegan
+        - ggvfields
+        - ggx
+        - gratia
+        - halfmoon
+        - insetplot
+        - layer
+        - mapcan
+        - mapSpain
+        - oblicubes
+        - ozmaps
+        - plotcli
+        - scatterbar
+        - sugarbag
+        - sugarglider
+        - sugrrants
+        - superb
+        - tidyterra
+        - WVPlots
+      # Plotting - colours, layouts, and scales
+        - afcharts
+        - amerika
+        - DOYPAColors
+        - figpatch
+        - flexoki
+        - GGenemy
+        - gghdx
+        - gglgbtq
+        - ggRtsy
+        - ggtea
+        - ggview
+        - ggwidth
+        - jumble
+        - MexBrewer
+        - monochromeR
+        - NatParksPalettes
+        - nord
+        - okcolors
+        - onsvplot
+        - pagenum
+        - poisonfrogs
+        - PrettyCols
+        - rbranding
+        - Rdune
+        - roughnet
+        - roughsf
+        - savonliquide
+        - stevethemes
+        - tayloRswift
+        - tgamtheme
+        - tinythemes
+        - tricolore
+        - unhcrthemes
+        - unicol
+        - unikn
+        - vangogh
+      # Plotting - interactive
+        - blockr.ggplot
+        - camcorder
+        - ggfigdone
+        - ivolcano
+      # Domain specific
+        - cv
+        - hdcuremodels
+        - landsat
+        - qrencoder
+        - rphylopic
+        - RRmorph
+        - RRphylo
+        - tongfen
+        - upstartr
+        - vitae
+      # Data
+        - bcdata
+        - cancensus
+        - cansim
+        - causaldata
+        - ces
+        - cmhc
+        - opendatatoronto
+        - psymetadata
+        - tidyhydat
+        - VancouvR
+      bioconductor:
+        - Rgraphviz
+        - ggkegg
+      github:
+      # Neuroimaging
+        - andy1764/CovBat_Harmonization/R
+        - ANTsX/ANTsR
+        - bidsconvertr/bidsconvertr
+        - jfortin1/neuroCombatData
+        - jfortin1/neuroCombat_Rpackage
+        - Mouse-Imaging-Centre/RMINC@develop
+        - Mouse-Imaging-Centre/MRIcrotome
+        - SimpleITK/SimpleITKRInstaller
+      # Stats
+        - yohanyee/normtools
+      gitlab:
+    vars:
+  unverified:
+    source:
+      pip:
+        - jaxkuramoto
+        - kuramoto
+        - kuramoto-chimera
+      pip_no_deps:
+      cran:
+      bioconductor:
+      github:
+      # Neuroimaging
+        - muschellij2/extrantsr
+      # Stats and data structures
+        - DataSlingers/ExclusiveLasso
+        - dhruba018/DMTL
+        - hyunjimoon/SBC
+        - r-lib/rray
+        - StoreyLab/biobroom
+      # Domain specific
+        - msberends/AMR
+        - peekxc/simplextree
+        - tdaverse/interplex
+      # External
+        - GreenGrassBlueOcean/MattermostR
+      # Plotting
+        - AakaashRao/starbility
+        - Ather-Energy/ggTimeSeries
+        - benyamindsmith/mapBliss
+        - benyamindsmith/starBliss
+        - BjnNowak/bertin
+        - briatte/ggnet
+        - bwanniarachchige2/ggtwotone
+        - coolbutuseless/ggsvg
+        - davidsjoberg/ggsankey
+        - davidsjoberg/ggstream
+        - diegovalle/mxmaps
+        - dill/emoGG
+        - dxsbiocc/ggideogram
+        - dzhang32/ggtranscript
+        - eliocamp/ggpercentogram
+        - ellisp/ggseas/pkg
+        - emilhvitfeldt/ggrandom
+        - EvaMaeRey/ggcalendar
+        - EvaMaeRey/ggols
+        - EvaMaeRey/ggstamp
+        - gadenbuie/ggweekly
+        - garretrc/ggvoronoi
+        - gnoblet/ggbranding
+        - giocomai/ganttrify
+        - hrbrmstr/ggcounty
+        - hrbrmstr/ggeconodist
+        - hrbrmstr/ggsolar
+        - hughjonesd/ggmagnify
+        - Hy4m/ggvwline
+        - i2z1/ggonion
+        - inbo/effectclass
+        - jared-fowler/prettyglm
+        - jasonwong-lab/gghic
+        - Jiawang1209/ggNetView
+        - jimjam-slam/ggflags
+        - jhrcook/ggasym
+        - jfjelstul/eumaps
+        - junjunlab/jjAnno
+        - kenithgrey/ggQC
+        - leonardojo/ggPlantmap
+        - liamgilbey/ggwaffle
+        - MarcellGranat/ggProfessional
+        - MattCowgill/ggdirectlabel
+        - mrjoh3/ggtrack
+        - nacnudus/ggbillboard
+        - nacnudus/ggstraw
+        - nevrome/ggpointgrid
+        - nsgrantham/ggbraid
+        - openpharma/visR
+        - paezha/truchet
+        - R-CoderDotCom/ggcats
+        - r-link/corrmorant
+        - ricardo-bion/ggradar
+        - rkabacoff/ggpie
+        - Sayani07/gghdr
+        - sctyner/geomnet
+        - sharlagelfand/ggkeyboard
+        - teunbrand/ggplateplot
+        - tgerke/ggconsort
+        - tdaverse/ggtda
+        - UrbanInstitute/urbnmapr
+        - yanpd01/ggsector
+        - yutannihilation/ggsflabel
+        - zmeers/ggparliament
+      # Plotting - color maps, layouts, scales, etc
+        - ashgreat/roughVizR
+        - bbc/bbplot
+        - BlakeRMills/MoMAColors
+        - clauswilke/ggtextures
+        - coolbutuseless/facetious
+        - datacamp/ggdc
+        - delabj/ggCyberPunk
+        - dracula/dRacula
+        - EdwinTh/dutchmasters
+        - ekholme/blueycolors
+        - friendly/ggCheysson
+        - gadenbuie/ggpomological
+        - Greater-London-Authority/gglaplot
+        - jbgb13/peRReo
+        - Jiawang1209/ggSketch
+        - johannesbjork/LaCroixColoR
+        - johnmackintosh/rockthemes
+        - junqueiragaabi/ButterflyColors
+        - kaizadp/soilpalettes
+        - MatthewBJane/ThemePark
+        - Mikata-Project/ggthemr
+        - mjskay/ggblend
+        - olihawkins/pilot
+        - R-CoderDotCom/cyberpunk
+        - RestlessTail/ggGenshin
+        - ricardo-bion/ggtech
+        - Ryo-N7/tvthemes
+        - sharlagelfand/ggcute
+        - teunbrand/ggchromatic
+        - thomas-neitmann/mdthemes
+        - UrbanInstitute/urbnthemes
+        - xvrdm/ggrough
+        - xvzftube/darknerdthemes
+        - yjunechoe/ggcolormeter
+      # Plotting - 3D
+        - coolbutuseless/cryogenic
+        - coolbutuseless/devout
+        - coolbutuseless/devoutrgl
+        - coolbutuseless/snowcrash
+        - coolbutuseless/ggreverse
+        - coolbutuseless/ggrgl
+        - coolbutuseless/ggthreed
+        - coolbutuseless/threed
+        - coolbutuseless/triangular
+      # Plotting - interactive
+        - AliciaSchep/gglabeller
+        - MattCowgill/ggannotate
+        - Roche/ggtips
+        - terrytangyuan/autoplotly
+      # Data
+        - hodgettsp/cesR
+        - mountainmath/canbank
+        - mountainmath/CanCovidData
+        - mountainmath/canpumf
+        - mountainmath/statcanXtabs
+        - paleolimbot/rcanvec
+        - ropensci/weathercan
+      gitlab:
+        - hrbrmstr/ggchicklet
+        - medbio/disgenet2r
+    vars:
+  deprecated:
+    source:
+      pip:
+        - snap-stanford
+      pip_no_deps:
+      cran:
+        - ggESDA
+        - neuroimaGene
+        - Rgnuplot
+        - trafo
+      github:
+      gitlab:
+    vars:
+special:
+  minc:
+    source:
+      pip:
+        - pyminc
+      pip_no_deps:
+      cran:
+      github:
+      gitlab:
+    vars:

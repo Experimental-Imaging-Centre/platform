@@ -1,0 +1,24 @@
+---
+
+# Micromamba vars
+# To be picked up by role dependency in meta/main.yml
+# Also sourced by provisioning/tasks/micromamba.yml
+root_prefix: /opt/share/conda
+root_prefix_condarc:
+  auto_activate_base: false
+  channels:
+    - conda-forge
+    - bioconda
+    - minc-forge
+    #- vfonov
+  channel_priority: strict
+  # See: https://docs.conda.io/projects/conda/en/stable/user-guide/configuration/admin-multi-user-install.html
+  pkgs_dirs:
+    - /opt/share/conda/pkgs  # Shared cache
+    - ~/.conda/pkgs          # User fallback
+  changeps1: false
+packages:
+  - mamba
+  - python=3.11
+
+# Environment
