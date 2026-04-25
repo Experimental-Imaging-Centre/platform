@@ -1,0 +1,20 @@
+---
+
+- name: Initial setup
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Initial setup of workstations
+      include_role:
+        name: provisioning
+        tasks_from: "{{ item }}"
+      loop:
+        - users
+        - dirs
+        - packagemanager
+        - micromamba
+        - packages
+

@@ -1,0 +1,13 @@
+---
+
+- name: Deploy micromamba
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Install micromamba
+      include_role:
+        name: provisioning
+        tasks_from: micromamba

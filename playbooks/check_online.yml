@@ -1,0 +1,17 @@
+---
+
+# Test demployment
+# - name: Initial deployment on test workstation
+#   hosts: workstations_test
+#   remote_user: root
+#   become: true
+#   include_role:
+#     name: sysadmin
+#     tasks_from: setup
+
+- name: Initial deployment on test workstation
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  tasks:
+  - ansible.builtin.debug:
+       msg: "The IP address of this host is {{ ansible_host }}"
