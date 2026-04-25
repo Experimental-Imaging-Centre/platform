@@ -1,0 +1,22 @@
+---
+
+# Paths
+local_path: /opt/local
+pipelines_path: /opt/pipelines
+environments_path: /opt/environments
+quarantine_path: /opt/quarantine
+share_path: /opt/share
+cvmfs_path: /cvmfs
+cc_project_path: /localhd/computecanada/trillium/project
+cc_scratch_path: /localhd/computecanada/trillium/scratch
+arc_work_path: /localhd/arc/work
+arc_scratch_path: /localhd/arc/scratch
+
+# Users
+admin_user: admin
+software_user: software
+cvmfs_user: cvmfs
+
+# Environment variables
+environment:
+  APPTAINER_TMPDIR: /scratch
