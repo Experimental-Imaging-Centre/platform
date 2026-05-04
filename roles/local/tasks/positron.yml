@@ -1,6 +1,6 @@
 ---
 ##################################################################################
-# RStudio
+# Positron
 ##################################################################################
 
 # Get vars from roles' vars/ directory
@@ -21,7 +21,7 @@
 
 - name: Set download link
   ansible.builtin.set_fact:
-    package_url: "{{ package_base_url }}/{{ package_os }}/{{ package_arch }}/Positron-{{ package_version }}-{{ package_arch | replace("x86_", "") }}.{{ package_pkg }}"
+    package_url: "{{ package_base_url }}/{{ package_os }}/{{ package_arch }}/Positron-{{ package_version }}-{{ package_arch | replace('x86_', 'x') }}.{{ package_pkg }}"
 
 - name: Create temporary directory to download package archive
   ansible.builtin.tempfile:
@@ -55,8 +55,6 @@
     src: "{{ temp_dir.path }}/usr/share/positron/"
     dest: "{{ base_path }}/install"
     remote_src: yes
-  args:
-    creates: "{{ base_path }}/install/positron"
 
 - name: Cleanup temporary directory
   ansible.builtin.file:
@@ -73,7 +71,7 @@
     mode: "4755"
 
 - name: Install module
-  template:
+  ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
   vars:

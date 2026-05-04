@@ -78,7 +78,7 @@
 
 # Modules
 - name: Install dependency module
-  template:
+  ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
   vars:
@@ -131,7 +131,7 @@
     state: link
 
 - name: Install package module
-  template:
+  ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ install_path }}/module.lua"
   vars:

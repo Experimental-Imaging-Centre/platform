@@ -153,7 +153,7 @@
 #
 # # Link modules
 - name: Install module
-  template:
+  ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
   vars:
