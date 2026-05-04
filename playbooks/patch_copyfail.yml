@@ -7,10 +7,10 @@
   become_method: sudo
   tasks:
     # - name: Blacklist the algif_aead module (manual)
-    #   ansible.builtin.shell: |
+    #   ansible.builtin.shell: >
     #     echo "install algif_aead /bin/false" | tee /etc/modprobe.d/manual-disable-algif_aead.conf
-    #     rmmod algif_aead 2>/dev/null
-    #     grep -qE '^algif_aead ' /proc/modules && echo "Affected module is loaded" || echo "Affected module is NOT loaded"
+    #     && rmmod algif_aead 2>/dev/null
+    #     && grep -qE '^algif_aead ' /proc/modules && echo "Affected module is loaded" || echo "Affected module is NOT loaded"
     #   creates: "/etc/modprobe.d/manual-disable-algif_aead.conf"
     - name: Patch by updating kmod
       ansible.builtin.apt:

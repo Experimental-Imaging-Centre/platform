@@ -47,10 +47,10 @@
 
 # Create Conda environment
 - name: Create environment
-  ansible.builtin.shell: |
+  ansible.builtin.shell: >
     export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
-    source "{{ root_prefix }}/etc/profile.d/mamba.sh"
-    mamba create --quiet --yes -p "{{ thisenv_path }}" -f "{{ base_path }}/{{ environment_name }}-conda.yml"
+    && source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+    && mamba create --quiet --yes -p "{{ thisenv_path }}" -f "{{ base_path }}/{{ environment_name }}-conda.yml"
   args:
     creates: "{{ thisenv_path }}"
   tags:
