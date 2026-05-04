@@ -32,6 +32,15 @@ pycharm:
     base_url: "https://download.jetbrains.com/python"
     checksum: "sha256:6405985fe82bc6a419005388930cbe318b7419b82cb09c8494035a2be8511b0f"
 
+positron:
+  package:
+    name: "positron"
+    version: "2026.04.1-10"
+    arch: "x86_64"
+    os: "deb"
+    pkg: "deb"
+    base_url: "https://cdn.posit.co/positron/releases"
+    checksum: "sha256:491cef95f76ea967e73606e07a59ca46361ea9161906a9a360762c310f9e862b"
 
 ############################
 # Old package definitions

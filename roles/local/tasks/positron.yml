@@ -1,0 +1,123 @@
+---
+##################################################################################
+# RStudio
+##################################################################################
+
+# Get vars from roles' vars/ directory
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ positron.package }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.name }}"
+    package_version: "{{ package.version }}"
+    package_arch: "{{ package.arch }}"
+    package_os: "{{ package.os }}"
+    package_pkg: "{{ package.pkg }}"
+    package_base_url: "{{ package.base_url }}"
+    package_checksum: "{{ package.checksum }}"
+    base_path: "{{ local_path }}/software/{{ package.name }}/{{ package.version }}"
+
+- name: Set download link
+  ansible.builtin.set_fact:
+    package_url: "{{ package_base_url }}/{{ package_os }}/{{ package_arch }}/Positron-{{ package_version }}-{{ package_arch | replace("x86_", "") }}.{{ package_pkg }}"
+
+- name: Create temporary directory to download package archive
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: build
+  register: temp_dir
+
+- name: Download the package archive with SHA256 verification
+  ansible.builtin.get_url:
+    url: "{{ package_url }}"
+    dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
+    checksum: "{{ package_checksum }}"
+
+- name: Create package install location
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ software_user }}"
+    mode: u=rwX,g=rX,o=rX
+  loop:
+    - "{{ base_path }}/install"
+
+- name: Extract the package
+  ansible.builtin.shell: >
+    dpkg -x "{{ temp_dir.path }}/{{ package_url | basename }}" "{{ temp_dir.path }}"
+  args:
+    creates: "{{ temp_dir.path }}/usr/share/positron"
+
+- name: Install the package
+  ansible.builtin.copy:
+    src: "{{ temp_dir.path }}/usr/share/positron/"
+    dest: "{{ base_path }}/install"
+    remote_src: yes
+  args:
+    creates: "{{ base_path }}/install/positron"
+
+- name: Cleanup temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+
+# Fix chrome/electron permissions for sandboxing
+- name: Set chrome/electron sandboxing permissions
+  become_user: root
+  ansible.builtin.file:
+    path: "{{ base_path }}/install/chrome-sandbox"
+    owner: root
+    group: root
+    mode: "4755"
+
+- name: Install module
+  template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package_name }}'"
+          - module_version: "'{{ package_version }}'"
+          - module_description: "'IDE for R and Python'"
+          - module_help: {"[[ IDE for data science, supporting the R and Python programming languages ]]" : str}
+        funcs:
+          - whatis: ["Name" : str, module_name]
+          - whatis: ["Version" : str, module_version]
+          - whatis: ["Description" : str, module_description]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      requires:
+        category: "Requires"
+        vars:
+          - R_path: capture("which R")
+        cmds:
+          - |
+            if (not R_path or R_path == "") then
+                LmodError('R must be in PATH. Try loading an analysis module')
+            end
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install'" ]
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ local_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    mode: '0755'
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    state: link
+

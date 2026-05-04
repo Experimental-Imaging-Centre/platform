@@ -3,4 +3,5 @@
 - {import_tasks: rstudio.yml, tags: rstudio}
 - {import_tasks: spyder.yml, tags: spyder}
 - {import_tasks: pycharm.yml, tags: pycharm}
+- {import_tasks: positron.yml, tags: positron}
 
