@@ -12,9 +12,10 @@
         name: provisioning
         tasks_from: "{{ item }}"
       loop:
+        - packagemanager
+        - packages
         - users
         - dirs
-        - packagemanager
         - micromamba
-        - packages
+
 

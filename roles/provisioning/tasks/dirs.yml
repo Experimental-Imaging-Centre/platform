@@ -22,11 +22,28 @@
     - "{{ quarantine_path }}/modulefiles"
     - "{{ share_path }}/software"
     - "{{ share_path }}/modulefiles"
+    - "{{ site_path }}"
 
 # Install lmod
+- name: Install lmod
+  ansible.builtin.package:
+    name: lmod
+    state: present
 
-# Config lmod
+# Copy lmod site config
+- name: Copy lmod site configuration
+  ansible.builtin.template:
+    src: templates/SitePackage.j2
+    dest: "{{ site_path }}/SitePackage.lua"
+    owner: "{{ software_user }}"
+    group: "{{ software_user }}"
+    mode: u=rw,g=r,o=r
 
-# Export paths
-# - LOCAL_PATH, PIPELINES_PATH, ENVIRONMENTS_PATH, QUARANTINE_PATH
-# - EIC_COMMON, EIC_PROJECTS, EIC_HOME
+# Copy platform variable definitions
+- name: Copy platform profile
+  ansible.builtin.template:
+    src: templates/platform.j2
+    dest: "/etc/profile.d/platform.sh"
+    owner: "{{ software_user }}"
+    group: "{{ software_user }}"
+    mode: u=rw,g=r,o=r

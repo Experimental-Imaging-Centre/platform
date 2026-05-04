@@ -1,0 +1,42 @@
+require("strict")
+local hook = require("Hook")
+
+local mapT =
+{
+   en_grouped = {
+      ['{{ environments_path }}/modulefiles$']  = "Analysis environments",
+      ['{{ local_path }}/modulefiles$']         = "Software",
+      ['{{ pipelines_path }}/modulefiles$']     = "Neuroimaging pipelines",
+      ['{{ quarantine_path }}/modulefiles$']    = "Neuroimaging frameworks and toolkits",
+      ['{{ share_path }}/modulefiles$']         = "Package and environment managers"
+
+   },
+   fr_grouped = {
+      ['{{ environments_path }}/modulefiles$']  = "Environnement d'analyse",
+      ['{{ local_path }}/modulefiles$']         = "Logiciels",
+      ['{{ pipelines_path }}/modulefiles$']     = "Boîte à outils logicielle de neuroimagerie",
+      ['{{ quarantine_path }}/modulefiles$']    = "Neuroimaging frameworks and toolkits",
+      ['{{ share_path }}/modulefiles$']         = "Gestionnaires de paquets logiciels et d'environnements"
+   }
+}
+
+
+function avail_hook(t)
+   local availStyle = masterTbl().availStyle
+   local styleT     = mapT[availStyle]
+   if (not availStyle or availStyle == "system" or styleT == nil) then
+      return
+   end
+
+   for k,v in pairs(t) do
+      for pat,label in pairs(styleT) do
+         if (k:find(pat)) then
+            t[k] = label
+            break
+         end
+      end
+   end
+end
+
+
+hook.register("avail",avail_hook)

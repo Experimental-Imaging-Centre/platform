@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+#############################
+# PATHS AND VARS
+#############################
+
+# Set platform name
+export PLATFORM="{{ platform_name }}"
+
+# Set paths
+export ENVIRONMENTS_PATH="{{ environments_path }}"
+export LOCAL_PATH="{{ local_path }}"
+export PIPELINES_PATH="{{ pipelines_path }}"
+export QUARANTINE_PATH="{{ quarantine_path }}"
+export SHARE_PATH="{{ share_path }}"
+export SITE_PATH="{{ site_path }}"
+export CVMFS_PATH="{{ cvmfs_path }}"
+
+# Platform specific environment variables
+export "{{ platform_name }}_COMMON"="{{ storage_common }}"
+export "{{ platform_name }}_DATA"="{{ storage_data }}"
+export "{{ platform_name }}_REPOS"="{{ storage_repos }}"
+export "{{ platform_name }}_HOME"="{{ storage_home }}"
+export "{{ platform_name }}_PROJECTS"="{{ storage_projects }}"
+
+# User specific environment variables
+if [ -d "{{ storage_projects }}/${USER}" ]
+then
+  export "PROJECTS"="{{ storage_projects }}/${USER}"
+fi
+
+#############################
+# LMOD MODULE CONFIG
+#############################
+
+# Define module path
+#export MODULEPATH=`echo "{{ environments_path }}/modulefiles:{{ local_path }}/modulefiles:{{ pipelines_path }}/modulefiles:{{ quarantine_path }}/modulefiles:{{ share_path }}/modulefiles:${MODULEPATH:+:$MODULEPATH}" | tr ':' '\n' | sort | uniq | tr '\n' ':'`
+export MODULEPATH="{{ environments_path }}/modulefiles:{{ local_path }}/modulefiles:{{ pipelines_path }}/modulefiles:{{ quarantine_path }}/modulefiles:{{ share_path }}/modulefiles"
+
+# Site package definitions (for custom labels)
+export LMOD_PACKAGE_PATH="{{ site_path }}"
+
+# Map custom labels based on system language
+if [[ "$LANGUAGE" == "en"* ]]; then
+  export LMOD_AVAIL_STYLE="system:<en_grouped>"
+elif [[ "$LANGUAGE" == "fr"* ]]; then
+  export LMOD_AVAIL_STYLE="system:<fr_grouped>"
+else
+  export LMOD_AVAIL_STYLE="system:<en_grouped>:fr_grouped"
+fi
+
