@@ -122,6 +122,7 @@ dependencies:
   - regex
   - rich
   - scalene
+  - "setuptools<82" # pkg_resources removed in setuptools>=82. While it is deprecated, it is needed by ITK and qbatch for now.
   - sh
   - six
   - tenacity
