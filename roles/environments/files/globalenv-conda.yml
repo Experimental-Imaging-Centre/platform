@@ -336,9 +336,11 @@ dependencies:
 # Database connections
   - bioconductor-annotationdbi
   - r-dbi
+  - r-googlesheets4
   - r-odbc
   - r-rpostgres
   - r-rsqlite
+  - r-sparklyr
 # Filesystem
   - r-fs
   - r-here
