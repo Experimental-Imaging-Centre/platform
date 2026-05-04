@@ -15,7 +15,7 @@
         - packagemanager
         - packages
         - users
-        - dirs
+        - platform_profile
         - micromamba
 
 
