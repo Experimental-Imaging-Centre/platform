@@ -29,6 +29,9 @@ then
   export "PROJECTS"="{{ storage_projects }}/${USER}"
 fi
 
+# User umask
+umask 027
+
 #############################
 # LMOD MODULE CONFIG
 #############################
@@ -48,4 +51,3 @@ elif [[ "$LANGUAGE" == "fr"* ]]; then
 else
   export LMOD_AVAIL_STYLE="system:<en_grouped>:fr_grouped"
 fi
-

@@ -47,3 +47,10 @@
     owner: "{{ software_user }}"
     group: "{{ software_user }}"
     mode: u=rw,g=r,o=r
+
+- name: Ensure default user umask is 027 in /etc/login.defs
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: '^UMASK\s+'
+    line: 'UMASK           027'
+    state: present
