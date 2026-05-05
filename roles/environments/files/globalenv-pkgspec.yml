@@ -1,10 +1,10 @@
 ---
 
 name: globalenv
-standard:
+python:
   trusted:
     source:
-      pip:
+      pypi:
       # Numerics
         - jax
         - jaxlib
@@ -43,9 +43,27 @@ standard:
         - pydo
       # Domain specific
         - particle
-      pip_no_deps:
+      pypi_no_deps:
       # Image processing
         - itk-vtkglue
+  unverified:
+    source:
+      pypi:
+        - jaxkuramoto
+        - kuramoto
+        - kuramoto-chimera
+      github:
+        - noxtoby/awkde
+        - ucl-pond/kde_ebm
+        - ucl-pond/pySuStaIn
+  deprecated:
+    source:
+      pypi:
+        - snap-stanford
+
+r:
+  trusted:
+    source:
       cran:
       # Numerics
         - AMCMC
@@ -288,17 +306,8 @@ standard:
         - SimpleITK/SimpleITKRInstaller
       # Stats
         - yohanyee/normtools
-      gitlab:
-    vars:
   unverified:
     source:
-      pip:
-        - jaxkuramoto
-        - kuramoto
-        - kuramoto-chimera
-      pip_no_deps:
-      cran:
-      bioconductor:
       github:
       # Neuroimaging
         - muschellij2/extrantsr
@@ -440,27 +449,10 @@ standard:
       gitlab:
         - hrbrmstr/ggchicklet
         - medbio/disgenet2r
-    vars:
   deprecated:
     source:
-      pip:
-        - snap-stanford
-      pip_no_deps:
       cran:
         - ggESDA
         - neuroimaGene
         - Rgnuplot
         - trafo
-      github:
-      gitlab:
-    vars:
-special:
-  minc:
-    source:
-      pip:
-        - pyminc
-      pip_no_deps:
-      cran:
-      github:
-      gitlab:
-    vars:

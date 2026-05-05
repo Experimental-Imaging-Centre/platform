@@ -117,6 +117,7 @@ dependencies:
   - pdbpp
   - pendulum
   - pipe
+  - pybind11
   - pydantic
   - pytest
   - regex
@@ -129,6 +130,7 @@ dependencies:
   - tqdm
   - typer
 # Parallel
+  - pathos
   - qbatch
 #  - scoop
   - uproot
@@ -195,6 +197,7 @@ dependencies:
   - awkward
   - bigtree
   - collections-extended
+  - dill
   - h5py
   - jmespath
   - json5
