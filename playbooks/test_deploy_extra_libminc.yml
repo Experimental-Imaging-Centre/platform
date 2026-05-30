@@ -1,0 +1,17 @@
+---
+
+- name: Install libminc
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install libminc into environment
+      include_role:
+        name: environments
+        tasks_from: "extra-libminc.yml"
+      vars:
+        condaenv: "{{ globalenv.condaenv }}"
+        extra_package: "{{ globalenv.condaenv.extras.build.libminc }}"
+        thisenv_path: "/opt/environments/global/globalenv/2026a/env"

@@ -1,0 +1,16 @@
+---
+
+- name: Clean conda cache
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Clean conda cache
+      include_role:
+        name: maintenance
+        tasks_from: conda_clean_cache
+
+
+

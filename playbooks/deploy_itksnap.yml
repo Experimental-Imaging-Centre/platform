@@ -1,13 +1,13 @@
 ---
 
-- name: Deploy micromamba
+- name: Deploy itk-snap
   hosts: workstations
   remote_user: "{{ admin_user }}"
   become: true
   become_user: "{{ software_user }}"
   become_method: sudo
   tasks:
-    - name: Install micromamba
+    - name: Install itk-snap
       include_role:
-        name: environments
-        tasks_from: micromamba
+        name: local
+        tasks_from: itksnap

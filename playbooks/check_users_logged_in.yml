@@ -1,13 +1,13 @@
 ---
 
-- name: Check status of machines
+- name: Check users logged in
   hosts: workstations
   remote_user: "{{ admin_user }}"
   become: true
   become_user: root
   become_method: sudo
   tasks:
-  - name: Check status
+  - name: Check users logged in
     include_role:
       name: maintenance
-      tasks_from: check_online
+      tasks_from: check_users_logged_in

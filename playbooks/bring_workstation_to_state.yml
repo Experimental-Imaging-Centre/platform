@@ -1,0 +1,90 @@
+---
+
+- name: Initial setup
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Initial setup of workstations
+      include_role:
+        name: provisioning
+        tasks_from: "{{ item }}"
+      loop:
+        - packagemanager
+        - packages
+        - users
+        - platform_profile
+    # - name: Install software via neuroansible
+    #   include_role:
+    #     name: neuroansible
+    #     tasks_from: "{{ item }}"
+    #   loop:
+    #     - containers
+    #     - afni
+    #     - ants
+    #     - freesurfer
+    #     - fastsurfer
+    #     - fsl
+    #     - fmriprep
+    #     - cpac
+    #     - civet
+    #     - qbatch
+    #     - minc
+    #     - cobralab
+    #     - mri_misc
+    #     - mrtrx
+    #     - resources
+    - name: Post-neuroansible cleaning
+      include_role:
+        name: maintenance
+        tasks_from: "{{ item }}"
+      loop:
+    #   - patch_copyfail.yml
+        - uninstall_neuroansible_system_modulepaths.yml
+    #   - uninstall_neuroansible_conda_software.yml
+        - uninstall_system_micromamba.yml
+        - update_hosts.yml
+
+- name: Deploy platform software
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+
+    - name: Install package managers
+      include_role:
+        name: environments
+        tasks_from: "{{ item }}"
+      loop:
+        - micromamba
+
+    - name: Install IDEs
+      include_role:
+        name: local
+        tasks_from: "{{ item }}"
+      loop:
+        - rstudio
+        - spyder
+        - positron
+        - pycharm
+
+    - name: Install visualization tools
+      include_role:
+        name: local
+        tasks_from: "{{ item }}"
+      loop:
+        - itksnap
+
+    - name: Install environments
+      include_role:
+        name: environments
+        tasks_from: "{{ item }}"
+      loop:
+        - globalenv
+        - av
+
+

@@ -1,0 +1,17 @@
+---
+
+- name: Deploy ITK-SNAP DLS
+  hosts: servers_research_services_itksnap_dls
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install itksnap-dls dependencies environment
+      include_role:
+        name: environments
+        tasks_from: itksnap-dls
+    - name: Install itksnap-dls service
+      include_role:
+        name: services
+        tasks_from: itksnap-dls-service

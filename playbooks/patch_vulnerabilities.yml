@@ -1,0 +1,26 @@
+---
+
+# See: https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available
+- name: Patch reported exploits
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Apply security patches provided by distribution and reboot
+      include_role:
+        name: maintenance
+        tasks_from: "{{ item }}"
+      loop:
+        - apt_update_upgrade
+        - reboot
+    - name: Disable vulnerable modules and reboot
+      include_role:
+        name: maintenance
+        tasks_from: "{{ item }}"
+      loop:
+        - disable_vulnerable_modules
+        - verify_vulnerable_modules_unloaded
+        - reboot
+        - verify_vulnerable_modules_unloaded
