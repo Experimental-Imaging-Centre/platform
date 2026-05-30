@@ -99,6 +99,16 @@
 # Install extras into environment
 ####################################
 
+# Example of incrementally adding an extra package into the environment
+# - name: Install remotes
+#   ansible.builtin.shell:
+#     cmd: >
+#       export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+#       && source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+#       && umask 022
+#       && /usr/bin/time -v mamba -vvv install --quiet --yes -p "{{ thisenv_path }}" r-remotes 2>&1 | tee /tmp/r-remotes.log
+#     executable: /bin/bash
+
 - name: Install libminc
   ansible.builtin.include_tasks:
     file: "extra-libminc.yml"
