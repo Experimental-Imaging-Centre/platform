@@ -8,10 +8,12 @@
 export PLATFORM="{{ platform_name }}"
 
 # Set paths
+export AGENTS_PATH="{{ agents_path }}"
 export ENVIRONMENTS_PATH="{{ environments_path }}"
 export LOCAL_PATH="{{ local_path }}"
 export PIPELINES_PATH="{{ pipelines_path }}"
 export QUARANTINE_PATH="{{ quarantine_path }}"
+export SERVICES_PATH="{{ services_path }}"
 export SHARE_PATH="{{ share_path }}"
 export SITE_PATH="{{ site_path }}"
 export CVMFS_PATH="{{ cvmfs_path }}"
@@ -38,7 +40,7 @@ umask 027
 
 # Define module path
 #export MODULEPATH=`echo "{{ environments_path }}/modulefiles:{{ local_path }}/modulefiles:{{ pipelines_path }}/modulefiles:{{ quarantine_path }}/modulefiles:{{ share_path }}/modulefiles:${MODULEPATH:+:$MODULEPATH}" | tr ':' '\n' | sort | uniq | tr '\n' ':'`
-export MODULEPATH="{{ environments_path }}/modulefiles:{{ local_path }}/modulefiles:{{ pipelines_path }}/modulefiles:{{ quarantine_path }}/modulefiles:{{ share_path }}/modulefiles"
+export MODULEPATH="{{ agents_path }}/modulefiles:{{ environments_path }}/modulefiles:{{ local_path }}/modulefiles:{{ pipelines_path }}/modulefiles:{{ quarantine_path }}/modulefiles:{{ services_path }}/modulefiles:{{ share_path }}/modulefiles"
 
 # Site package definitions (for custom labels)
 export LMOD_PACKAGE_PATH="{{ site_path }}"

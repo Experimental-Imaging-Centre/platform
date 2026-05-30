@@ -7,3 +7,19 @@
     home: "/home/{{ software_user }}"
     shell: /bin/bash
     state: present
+
+- name: "Add the local user owner of research service servers: {{ research_service_servers_user }}"
+  ansible.builtin.user:
+    name: "{{ research_service_servers_user }}"
+    comment: "{{ platform_name }} research service servers"
+    home: "/home/{{ research_service_servers_user }}"
+    shell: /bin/bash
+    state: present
+
+- name: "Add the local user owner of AI agents: {{ agents_user }}"
+  ansible.builtin.user:
+    name: "{{ agents_user }}"
+    comment: "{{ platform_name }} agents"
+    home: "/home/{{ agents_user }}"
+    shell: /bin/bash
+    state: present

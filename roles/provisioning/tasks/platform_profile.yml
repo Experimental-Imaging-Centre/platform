@@ -9,6 +9,8 @@
     group: "{{ software_user }}"
     mode: u=rwx,g=rx,o=rx
   loop:
+    - "{{ agents_path }}/software"
+    - "{{ agents_path }}/modulefiles"
     - "{{ environments_path }}/global"
     - "{{ environments_path }}/standard"
     - "{{ environments_path }}/dependencies"
@@ -20,6 +22,8 @@
     - "{{ quarantine_path }}/resources"
     - "{{ quarantine_path }}/software"
     - "{{ quarantine_path }}/modulefiles"
+    - "{{ services_path }}/servers"
+    - "{{ services_path }}/modulefiles"
     - "{{ share_path }}/software"
     - "{{ share_path }}/modulefiles"
     - "{{ site_path }}"
@@ -48,9 +52,11 @@
     group: "{{ software_user }}"
     mode: u=rw,g=r,o=r
 
-- name: Ensure default user umask is 027 in /etc/login.defs
+# This is for non-interactive non-login shells, specifically targetting the software_user
+# For interactive (user) shells, set that in /etc/profile.d using the templating task above this one instead
+- name: Ensure default umask is 022 in /etc/login.defs
   ansible.builtin.lineinfile:
     path: /etc/login.defs
     regexp: '^UMASK\s+'
-    line: 'UMASK           027'
+    line: 'UMASK           022'
     state: present

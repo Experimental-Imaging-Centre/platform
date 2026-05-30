@@ -1,9 +1,0 @@
----
-
-# Package definitions:
-micromamba:
-  package:
-    name: micromamba
-    version: 2.5.0
-    arch: linux-64
-

@@ -1,10 +1,26 @@
 ---
 
-- {import_tasks: packagemanager.yml, tags: packagemanager}
-- {import_tasks: packages.yml, tags: packages}
-- {import_tasks: users.yml, tags: users}
-- {import_tasks: platform_profile.yml, tags: platform_profile}
-- {import_tasks: micromamba.yml, tags: micromamba}
+- import_tasks: packagemanager.yml
+  tags:
+    - "provisioning"
+    - "packagemanager"
+
+- import_tasks: packages.yml
+  tags:
+    - "provisioning"
+    - "packages"
+
+- import_tasks: users.yml
+  tags:
+    - "provisioning"
+    - "users"
+
+- import_tasks: platform_profile.yml
+  tags:
+    - "provisioning"
+    - "platform_profile"
+
+
 
 
 
