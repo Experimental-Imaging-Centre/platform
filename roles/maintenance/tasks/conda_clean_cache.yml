@@ -1,0 +1,37 @@
+---
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure micromamba binary is present"
+  ansible.builtin.import_role:
+    name: environments
+    tasks_from: micromamba.yml
+
+####################################
+# Clean conda cache
+####################################
+
+- name: Check micromamba info
+  ansible.builtin.shell:
+    cmd: |
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      mamba info
+    executable: /bin/bash
+  register: debug_out
+
+- name: Print micromamba info
+  ansible.builtin.debug:
+    var: debug_out.stdout_lines
+
+# Create Conda environment
+- name: Clean cache
+  ansible.builtin.shell:
+    cmd: >
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      && source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      && umask 022
+      && mamba clean --all --yes
+    executable: /bin/bash

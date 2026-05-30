@@ -1,0 +1,5 @@
+---
+
+- name: Check status
+  ansible.builtin.debug:
+       msg: "The IP address of this host is {{ ansible_host }}"

@@ -1,0 +1,10 @@
+---
+
+# Uninstall neuroansible-installed system MODULEPATH profile
+- name: Removing zzquarantine_path.sh from /etc/profile.d
+  ansible.builtin.file:
+    path: "/etc/profile.d/zzquarantine_path.sh"
+    state: absent
+
+
+

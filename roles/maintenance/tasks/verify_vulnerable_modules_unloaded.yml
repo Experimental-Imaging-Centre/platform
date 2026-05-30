@@ -1,0 +1,29 @@
+---
+
+- name: Check if module in /proc/modules
+  ansible.builtin.shell: "grep -qE '^{{ item }}' /proc/modules && echo '{{ item }} is loaded' || echo '{{ item }} is NOT loaded'"
+  loop:
+    - algif_aead
+    - esp4
+    - esp6
+    - rxrpc
+  register: check_loaded_proc
+
+- name: Print result of /proc/modules check
+  ansible.builtin.debug:
+    msg: "{{ item.stdout }}"
+  loop: "{{ check_loaded_proc.results }}"
+
+- name: Check via lsmod
+  ansible.builtin.shell: "lsmod | grep '^{{ item }}' && echo '{{ item }} is loaded' || echo '{{ item }} is NOT loaded'"
+  loop:
+    - algif_aead
+    - esp4
+    - esp6
+    - rxrpc
+  register: check_loaded_lsmod
+
+- name: Print result of lsmod check
+  ansible.builtin.debug:
+    msg: "{{ item.stdout }}"
+  loop: "{{ check_loaded_lsmod.results }}"

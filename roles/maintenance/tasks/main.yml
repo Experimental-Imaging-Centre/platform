@@ -1,0 +1,38 @@
+---
+
+# General maintenance
+- import_tasks: check_online.yml
+  tags:
+    - "maintenance"
+    - "check_online"
+
+# Rare mostly one-time things
+- import_tasks: patch_copyfail.yml
+  tags:
+    - "maintenance"
+    - "patch_copyfail"
+    - "never"
+
+- import_tasks: uninstall_neuroansible_system_modulepaths.yml
+  tags:
+    - "maintenance"
+    - "uninstall_neuroansible_system_modulepaths"
+    - "never"
+
+- import_tasks: uninstall_neuroansible_conda_software.yml
+  tags:
+    - "maintenance"
+    - "uninstall_neuroansible_conda_software"
+    - "never"
+
+- import_tasks: uninstall_system_micromamba.yml
+  tags:
+    - "maintenance"
+    - "uninstall_system_micromamba"
+    - "never"
+
+- import_tasks: conda_clean_cache.yml
+  tags:
+    - "maintenance"
+    - "conda_clean_cache"
+    - "never"

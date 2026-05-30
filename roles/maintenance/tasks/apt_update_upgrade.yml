@@ -1,0 +1,6 @@
+---
+
+- name: apt update and upgrade
+  ansible.builtin.apt:
+    update_cache: yes
+    upgrade: safe

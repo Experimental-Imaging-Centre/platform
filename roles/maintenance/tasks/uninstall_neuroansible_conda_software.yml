@@ -1,0 +1,53 @@
+---
+
+# Uninstall neuroansible-installed conda software and modules
+- name: Removing R (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/R"
+    state: absent
+- name: Removing RMINC (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/RMINC"
+    state: absent
+- name: Removing MRIcrotome (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/MRIcrotome"
+    state: absent
+- name: Removing mni.cortical.statistics (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/mni.cortical.statistics"
+    state: absent
+- name: Removing RStudio (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/rstudio"
+    state: absent
+- name: Removing conda (software)
+  ansible.builtin.file:
+    path: "/opt/quarantine/software/conda"
+    state: absent
+- name: Removing R (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/R"
+    state: absent
+- name: Removing RMINC (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/RMINC"
+    state: absent
+- name: Removing MRIcrotome (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/MRIcrotome"
+    state: absent
+- name: Removing mni.cortical.statistics (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/mni.cortical.statistics"
+    state: absent
+- name: Removing RStudio (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/rstudio"
+    state: absent
+- name: Removing conda (modules)
+  ansible.builtin.file:
+    path: "/opt/quarantine/modulefiles/conda"
+    state: absent
+
+

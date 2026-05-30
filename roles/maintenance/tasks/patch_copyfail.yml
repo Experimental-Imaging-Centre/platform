@@ -1,0 +1,17 @@
+---
+
+# Patch copy fail exploit (CVE-2026-31431)
+# See: https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available
+
+# - name: Blacklist the algif_aead module (manual)
+#   ansible.builtin.shell: >
+#     echo "install algif_aead /bin/false" | tee /etc/modprobe.d/manual-disable-algif_aead.conf
+#     && rmmod algif_aead 2>/dev/null
+#     && grep -qE '^algif_aead ' /proc/modules && echo "Affected module is loaded" || echo "Affected module is NOT loaded"
+#   creates: "/etc/modprobe.d/manual-disable-algif_aead.conf"
+- name: Patch by updating kmod
+  ansible.builtin.apt:
+    update_cache: yes
+    upgrade: safe
+- name: Reboot the machine
+  ansible.builtin.reboot:

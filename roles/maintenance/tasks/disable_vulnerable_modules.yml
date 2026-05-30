@@ -1,0 +1,48 @@
+---
+
+# Adapted from https://www.reddit.com/r/sysadmin/comments/1t7dlbw/ansible_playbook_for_dirty_frag_mitigation/ and https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available
+
+- name: Disable modules on boot
+  ansible.builtin.copy:
+    dest: "/etc/modprobe.d/ansible-disable-{{ item }}.conf"
+    content: |
+      install {{ item }} /bin/false
+      blacklist {{ item }}
+  loop:
+    - algif_aead
+    - esp4
+    - esp6
+    - rxrpc
+  register: boot_disable
+
+- name: Disable module aliases
+  ansible.builtin.copy:
+    dest: "/etc/modprobe.d/ansible-disable-modulealiases.conf"
+    content: |
+      alias net-pf-33 off
+      alias xfrm-type-2-50 off
+      alias xfrm-type-10-50 off
+  register: alias_disable
+
+- name: Disable modules immediately
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - algif_aead
+    - esp4
+    - esp6
+    - rxrpc
+  register: immediate_disable
+
+- name: Clean drop cache
+  shell: echo 3 > /proc/sys/vm/drop_caches
+  when: boot_disable.changed or immediate_disable.changed or alias_disable.changed
+
+- name: Update initramfs
+  ansible.builtin.command: update-initramfs -u -k all
+  register: update_initramfs_output
+
+- name: Print result of initramfs update
+  ansible.builtin.debug:
+    msg: "{{ update_initramfs_output.stdout_lines }}"

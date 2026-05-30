@@ -1,0 +1,10 @@
+---
+
+# Uninstall system micromamba
+- name: Removing micromamba binary
+  ansible.builtin.file:
+    path: "/usr/local/bin/micromamba"
+    state: absent
+
+
+

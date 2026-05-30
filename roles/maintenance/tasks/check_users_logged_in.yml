@@ -1,0 +1,10 @@
+---
+
+- name: Get current logged in users and what they are doing
+  ansible.builtin.command: w
+  register: wout
+  changed_when: false
+
+- name: Display output of w
+  ansible.builtin.debug:
+    msg: "{{ wout.stdout_lines }}"

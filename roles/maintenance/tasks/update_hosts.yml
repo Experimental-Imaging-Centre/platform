@@ -1,0 +1,9 @@
+---
+
+- name: Update hosts
+  ansible.builtin.template:
+    src: templates/hosts.j2
+    dest: "/etc/hosts"
+    owner: "root"
+    group: "root"
+    mode: u=rw,g=r,o=r
