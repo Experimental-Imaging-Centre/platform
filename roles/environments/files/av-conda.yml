@@ -1,0 +1,218 @@
+---
+
+name: globalenv
+channels:
+  - conda-forge
+  - minc-forge
+  - bioconda
+channel_priority: strict
+dependencies:
+############################
+# Basics
+############################
+  - conda-bash-completion
+  - cuda-cudart
+  - cuda-version=12
+  - ffmpeg
+  - imagemagick
+  - jupyterlab
+  - nb_conda_kernels
+  - openblas
+############################
+# PYTHON
+############################
+# Base
+  - python=3.11
+  - pip
+  - ipython
+  - ipykernel
+  - ipywidgets
+# Spyder dependencies
+  - spyder-kernels>=3.1.0,<3.2.0
+# Helper packages
+  - autoflake
+  - bcrypt
+  - configparser
+  - configupdater
+  - more-itertools
+  - pandoc
+  - pendulum
+  - pipe
+  - pydantic
+  - pytest
+  - regex
+  - rich
+  - "setuptools<82" # pkg_resources removed in setuptools>=82. While it is deprecated, it is needed by ITK and qbatch for now.
+  - sh
+  - six
+  - tenacity
+  - tqdm
+  - ty
+  - typer
+# Numerics
+  - numba
+  - numpy
+  - scipy
+# Data frames
+  - pandas
+  - polars
+  - pyarrow
+  - sklearn-pandas
+# Image processing
+  - imageio
+  - pillow
+# AV processing and data streaming
+  - av
+  - ffmpeg-python
+  - imageio-ffmpeg
+  - ipywebrtc
+  - opencv
+  - moviepy
+  - pyaudio
+  - python-sounddevice
+  - webrtcvad
+  - xwebrtc
+# ML
+  - scikit-image
+  - scikit-learn
+  - scikit-learn-intelex
+  - scikit-multilearn
+# Plotting
+  - matplotlib
+  - plotnine
+  - seaborn
+# Web development
+  - streamlit
+  - urllib3
+  - websockets
+  - websocket-client
+
+############################
+# R
+############################
+# Base
+  - r-base
+  - r-essentials
+  - r-recommended
+  - r-devtools
+  - r-irkernel
+  - r-biocmanager
+# Tidyverse
+  - r-tidyverse
+  - r-tidymodels
+# Helper packages
+  - r-argparse
+  - r-available
+  - r-beepr
+  - r-bindr
+  - r-config
+  - r-configr
+  - r-curl
+  - r-formula
+  - r-glue
+  - r-hmisc
+  - r-janitor
+  - r-logger
+  - r-magick
+  - r-pak
+  - r-pbapply
+  - r-rcpp
+  - r-recipes
+  - r-rlang
+  - r-systemfonts
+  - r-tictoc
+# Pipelines and parallelization
+  - r-foreach
+  - r-domc
+  - r-doparallel
+  - r-dosnow
+  - r-snowfall
+  - r-targets
+# File formats and I/O
+  - r-cairo
+  - r-jsonlite
+  - r-pdftools
+  - r-png
+  - r-r.matlab
+  - r-rcppcnpy
+  - r-readxl
+  - r-rjson
+  - r-rsvg
+  - r-svglite
+  - r-tiff
+  - r-xml2
+  - r-yaml
+# Data structures, classes, and methods
+  - r-arrow
+  - r-data.table
+  - r-data.tree
+  - r-dt
+  - r-matrix
+  - r-stringi
+  - r-tidytext
+  - r-vctrs
+# Numerical tools and algorithms
+  - r-abind
+# Image and shape processing
+  - r-imager
+  - r-mmand
+  - r-openimager
+  - r-spatialtools
+  - r-transformr
+  - r-tweenr
+# Optimization and solvers
+  - r-optimx
+# Modeling
+  - r-lme4
+  - r-lmertest
+  - r-matrixmodels
+  - r-nlme
+# Clustering
+  - r-biclust
+  - r-cluster
+  - r-mclust
+# Multivariate
+  - r-fastica
+  - r-ica
+  - r-mass
+  - r-plsdepot
+# ML packages
+  - r-caret
+  - r-nnet
+  - r-randomforest
+# Plotting - specific types
+  - r-corrplot
+  - r-factoextra
+  - r-gplots
+  - r-gridbase
+  - r-pheatmap
+  - r-rgl
+  - r-tidyplots
+# Plotting - ggplot extensions
+  - r-cowplot
+  - r-ggalign
+  - r-ggalluvial
+  - r-ggally
+  - r-ggdendro
+  - r-ggextra
+  - r-ggforce
+  - r-ggfx
+  - r-ggh4x
+  - r-ggnewscale
+  - r-ggpubr
+  - r-ggrepel
+  - r-ggsignif
+  - r-ggthemes
+  - r-ggwordcloud
+  - r-patchwork
+# Plotting - colours, layouts, and scales
+  - r-viridis
+# Plotting - interactive and animations
+  - r-gganimate
+  - r-shiny
+# Domain specific
+  - r-av
+  - r-psych
+#  - r-rminc
+
+

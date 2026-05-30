@@ -1,0 +1,8 @@
+---
+
+name: itksnap-dls-service
+python_packages:
+  trusted:
+    source:
+      pypi:
+        - itksnap-dls==0.1.2

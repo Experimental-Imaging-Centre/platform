@@ -1,0 +1,10 @@
+---
+
+name: globalenv
+python_packages:
+  trusted:
+    source:
+      pypi:
+      # AV
+        - aiortc
+        - streamlit-webrtc
