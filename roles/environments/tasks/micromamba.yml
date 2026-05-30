@@ -1,0 +1,125 @@
+--- # micromamba
+
+##################################################################################
+# Micromamba
+##################################################################################
+
+####################################
+# Get/set vars
+####################################
+
+# Get vars from roles' vars/ directory
+- name: Get package/environment information
+  ansible.builtin.set_fact:
+    package: "{{ micromamba.package }}"
+
+# Set task vars
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    base_path: "{{ share_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
+
+####################################
+# Setup directories
+####################################
+
+# Setup initial directories
+- name: Create required directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+  loop:
+    - "{{ base_path }}/install/bin"
+
+- name: Check vars for micromamba install
+  ansible.builtin.debug:
+    msg: "Root prefix: {{ root_prefix }}, auto activate?: {{ root_prefix_condarc.auto_activate_base }}"
+
+####################################
+# Install micromamba using role
+####################################
+
+# Install micromamba using mambaorg.micromamba role
+- name: Install micromamba
+  include_role:
+    name: mambaorg.micromamba
+    apply:
+      environment:
+        PATH: "{{ base_path }}/install/bin:{{ ansible_env.PATH }}"
+  vars:
+    arch: "{{ package.info.arch }}" # Overrides default arch roles/mambaorg.micromamba/defaults/main.yml
+    version: "{{ package.info.version }}" # Overrides default version roles/mambaorg.micromamba/defaults/main.yml
+    dest: "{{ base_path }}/install/bin/micromamba" # Overrides default destination roles/mambaorg.micromamba/defaults/main.yml
+
+####################################
+# Install micromamba module
+####################################
+
+- name: Install module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - family: [ "conda" : quote ]
+          - conflict: [ module_name ]
+      environment:
+        funcs:
+          - pushenv: [ "'MAMBA_ROOT_PREFIX'" , "'{{ root_prefix }}'" ]
+      paths:
+        category: "Paths"
+        vars:
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+      conda:
+        category: "Conda"
+        vars:
+          - mamba_hook_call: '"\"$(micromamba shell hook --shell " .. myShellName() .. ")\""'
+        cmds:
+          - |
+            execute {
+              cmd = "eval " .. mamba_hook_call,
+              modeA = {"load"}
+            }
+          - |
+            execute {
+              cmd = "unset micromamba",
+              modeA = {"unload"}
+            }
+
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ share_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ share_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link

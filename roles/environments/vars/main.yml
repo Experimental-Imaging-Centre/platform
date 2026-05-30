@@ -1,8 +1,28 @@
 ---
 
+############################
+# Latest package definitions
+############################
+
+# Base URL, etc... picked up by vars within micromamba role
+micromamba:
+  package:
+    info:
+      name: micromamba
+      version: 2.5.0
+      arch: linux-64
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "CLI tool to manage conda environments"
+      help: "Micromamba is a tiny, incredibly fast, and fully self-contained version of the mamba package manager. Packaged as a single C++ executable, it requires no base environment, has no pre-installed Python, and is a drop-in, lightweight alternative to standard conda."
+
+############################
+# Mamba vars
+############################
+
 # Micromamba vars
-# To be picked up by role dependency in meta/main.yml
-# Also sourced by provisioning/tasks/micromamba.yml
 root_prefix: /opt/share/conda
 root_prefix_condarc:
   auto_activate_base: false
@@ -17,8 +37,85 @@ root_prefix_condarc:
     - /opt/share/conda/pkgs  # Shared cache
     - ~/.conda/pkgs          # User fallback
   changeps1: false
+  use_sharded_repodata: false # Sharded repo data causes issues with solving for large environments built from mixed channels - revert to flat repodata
 packages:
-  - mamba
+  - mamba=2.5.0
   - python=3.11
 
+############################
+# Build vars
+############################
+
+R_pkg_build_vars:
+  R_LIBS_SITE: "{{ share_path }}/R/library/{{ r_version }}:{{ thisenv_path }}/lib/R/library"
+  PATH: "{{ thisenv_path }}/bin:{{ ansible_env.PATH | default('') }}"
+  CPATH: "{{ thisenv_path }}/include:{{ ansible_env.CPATH | default('') }}"
+  LIBRARY_PATH: "{{ thisenv_path }}/lib:{{ ansible_env.LIBRARY_PATH | default('') }}"
+  LD_LIBRARY_PATH: "{{ thisenv_path }}/lib:{{ ansible_env.LD_LIBRARY_PATH | default('') }}"
+  MAKEJ: "6"
+  ADDITIONAL_SITK_MODULES: "-DSimpleITK_USE_ELASTIX=ON -DModule_ITKIODCMTK:BOOL=ON"
+
+
+
+############################
+# Environment vars
+############################
+
 # Environment
+globalenv:
+  condaenv:
+    info:
+      name: "globalenv"
+      version: "2026a"
+      type: "global"
+    specs:
+      conda: "globalenv-conda.yml"
+      other: "globalenv-pkgspec.yml"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Global analysis environment"
+      help: "A global environment for interactive analyses containing a wide range of Python and R packages."
+    extras:
+      build:
+        libminc:
+          info:
+            name: "libminc"
+            version: "2.5.0"
+          src:
+            base_url: "https://github.com/BIC-MNI/libminc/archive/refs/tags"
+            checksum: "sha256:57d807e86a353a93024a8849f5e21e2abea4f09f0be934e1f538bdc2b02f8885"
+
+
+av:
+  condaenv:
+    info:
+      name: "av"
+      version: "2026a"
+      type: "standard"
+    specs:
+      conda: "av-conda.yml"
+      other: "av-pkgspec.yml"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Audio-visual processing environment"
+      help: "A standard environment for processing audio-visual data using Python and R."
+
+itksnap_dls:
+  condaenv:
+    info:
+      name: "itksnap-dls"
+      version: "0.1.2"
+      type: "dependencies"
+    specs:
+      conda: "itksnap-dls-conda.yml"
+      other: "itksnap-dls-pkgspec.yml"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Dependency environment for itksnap-dls-service/0.1.2. Load itksnap-dls-service/0.1.2 to use that service instead."
+      help: "A dependency environment for itksnap-dls-service/0.1.2. This is a helper module. You only need to load itksnap-dls-service/0.1.2 to use that service. Do not use this module unless you know what you are doing."

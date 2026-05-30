@@ -1,5 +1,26 @@
 ---
 
-- {import_tasks: globalenv.yml, tags: globalenv}
+- import_tasks: micromamba.yml
+  tags:
+    - "environment"
+    - "micromamba"
+
+- import_tasks: globalenv.yml
+  tags:
+    - "environment"
+    - "global"
+    - "globalenv"
+
+- import_tasks: av.yml
+  tags:
+    - "environment"
+    - "standard"
+    - "av"
+
+- import_tasks: itksnap-dls.yml
+  tags:
+    - "environment"
+    - "dependencies"
+    - "itksnap-dls"
 
 

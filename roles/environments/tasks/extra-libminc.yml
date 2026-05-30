@@ -1,0 +1,124 @@
+--- # extra-libminc
+
+##################################################################################
+# Extra environment package: libminc
+##################################################################################
+
+####################################
+# Get vars and set paths
+####################################
+
+- name: Set extra package task variables
+  ansible.builtin.set_fact:
+    extra_package_name: "{{ extra_package.info.name }}"
+    extra_package_version: "{{ extra_package.info.version }}"
+    extra_package_base_url: "{{ extra_package.src.base_url }}"
+    extra_package_checksum: "{{ extra_package.src.checksum }}"
+    extra_install_path: "{{ thisenv_path }}"
+
+- name: Set extra package download link
+  ansible.builtin.set_fact:
+    extra_package_url: "{{ extra_package_base_url }}/release-{{ extra_package_version }}.tar.gz"
+
+- name: Set extra package expected paths
+  ansible.builtin.set_fact:
+    expected_extra_lib: "{{ extra_install_path }}/lib/libminc2.so"
+    expected_extra_header: "{{ extra_install_path }}/include/minc2.h"
+
+- name: Check if expected files exist for idempotency (extra lib)
+  ansible.builtin.stat:
+    path: "{{ expected_extra_lib }}"
+  register: check_exists_expected_extra_lib
+
+- name: Check if expected files exist for idempotency (extra header)
+  ansible.builtin.stat:
+    path: "{{ expected_extra_header }}"
+  register: check_exists_expected_extra_header
+
+####################################
+# Download and extract package
+####################################
+
+- name: Create temporary directory to download extras
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: download
+  register: download_dir
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+- name: Create temporary directory to build extras
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: build
+  register: build_dir
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+- name: Download libminc
+  ansible.builtin.get_url:
+    url: "{{ extra_package_url }}"
+    dest: "{{ download_dir.path }}/{{ extra_package_url | basename }}"
+    checksum: "{{ extra_package_checksum }}"
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+- name: Extract package
+  ansible.builtin.unarchive:
+    src: "{{ download_dir.path }}/{{ extra_package_url | basename }}"
+    dest: "{{ build_dir.path }}"
+    creates: "{{ build_dir.path }}/CMakeLists.txt"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    remote_src: yes
+    extra_opts: [--strip-components=1,--no-same-owner]
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+####################################
+# Build and install package
+####################################
+
+- name: Build package
+  ansible.builtin.shell:
+    cmd: >
+      cmake -DLIBMINC_BUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="{{ extra_install_path }}" .
+      && make -j4
+    executable: /bin/bash
+  args:
+    chdir: "{{ build_dir.path }}"
+    creates: "{{ build_dir.path }}/CMakeFiles"
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+- name: Install package
+  ansible.builtin.shell:
+    cmd: make install
+    executable: /bin/bash
+  args:
+    chdir: "{{ build_dir.path }}"
+    creates: "{{ extra_install_path }}/libminc2.so"
+  when:
+    - not check_exists_expected_extra_lib.stat.exists
+    - not check_exists_expected_extra_header.stat.exists
+
+####################################
+# Cleanup temporary directories
+####################################
+
+- name: Cleanup temporary download directory
+  ansible.builtin.file:
+    path: "{{ download_dir.path }}"
+    state: absent
+  when: download_dir.path is defined
+
+- name: Cleanup temporary build directory
+  ansible.builtin.file:
+    path: "{{ build_dir.path }}"
+    state: absent
+  when: build_dir.path is defined
