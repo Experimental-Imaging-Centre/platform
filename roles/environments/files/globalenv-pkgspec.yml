@@ -1,7 +1,7 @@
 ---
 
 name: globalenv
-python:
+python_packages:
   trusted:
     source:
       pypi:
@@ -30,6 +30,9 @@ python:
         - group-lasso
         - lassonet
         - opnmf
+      # AV
+        - aiortc
+        - streamlit-webrtc
       # Data mining
         - pubget
       # Visualization
@@ -43,28 +46,34 @@ python:
         - pydo
       # Domain specific
         - particle
-      pypi_no_deps:
-      # Image processing
-        - itk-vtkglue
+      github:
+        - "noxtoby/awkde": awkde
+        - "ucl-pond/kde_ebm": kde_ebm
+        - "ucl-pond/pySuStaIn": pySuStaIn
   unverified:
     source:
       pypi:
         - jaxkuramoto
         - kuramoto
         - kuramoto-chimera
-      github:
-        - noxtoby/awkde
-        - ucl-pond/kde_ebm
-        - ucl-pond/pySuStaIn
   deprecated:
     source:
       pypi:
         - snap-stanford
+      pypi_no_deps:
+      # Image processing
+        - itk-vtkglue
 
-r:
+r_packages:
   trusted:
     source:
       cran:
+      # Development
+        - CodeDepends
+        - functiondepends
+        - funviewR
+        - pkgdepR
+        - pkgnet
       # Numerics
         - AMCMC
         - fmcmc
@@ -296,159 +305,159 @@ r:
         - ggkegg
       github:
       # Neuroimaging
-        - andy1764/CovBat_Harmonization/R
-        - ANTsX/ANTsR
-        - bidsconvertr/bidsconvertr
-        - jfortin1/neuroCombatData
-        - jfortin1/neuroCombat_Rpackage
-        - Mouse-Imaging-Centre/RMINC@develop
-        - Mouse-Imaging-Centre/MRIcrotome
-        - SimpleITK/SimpleITKRInstaller
+        - "andy1764/CovBat_Harmonization/R": CovBat
+        - "ANTsX/ANTsR": ANTsR
+        - "bidsconvertr/bidsconvertr": bidsconvertr
+        - "jfortin1/neuroCombatData": neuroCombatData
+        - "jfortin1/neuroCombat_Rpackage": neuroCombat_Rpackage
+        - "Mouse-Imaging-Centre/RMINC@develop": RMINC
+        - "Mouse-Imaging-Centre/MRIcrotome": MRIcrotome
+        - "SimpleITK/SimpleITKRInstaller": SimpleITK
       # Stats
-        - yohanyee/normtools
+        - "yohanyee/normtools": normtools
   unverified:
     source:
       github:
       # Neuroimaging
-        - muschellij2/extrantsr
+        - "muschellij2/extrantsr": extrantsr
       # Stats and data structures
-        - DataSlingers/ExclusiveLasso
-        - dhruba018/DMTL
-        - hyunjimoon/SBC
-        - r-lib/rray
-        - StoreyLab/biobroom
+        - "DataSlingers/ExclusiveLasso": ExclusiveLasso
+        - "dhruba018/DMTL": DMTL
+        - "hyunjimoon/SBC": SBC
+        - "r-lib/rray": rray
+        - "StoreyLab/biobroom": biobroom
       # Domain specific
-        - msberends/AMR
-        - peekxc/simplextree
-        - tdaverse/interplex
+        - "msberends/AMR": AMR
+        - "peekxc/simplextree": simplextree
+        - "tdaverse/interplex": interplex
       # External
-        - GreenGrassBlueOcean/MattermostR
+        - "GreenGrassBlueOcean/MattermostR": MattermostR
       # Plotting
-        - AakaashRao/starbility
-        - Ather-Energy/ggTimeSeries
-        - benyamindsmith/mapBliss
-        - benyamindsmith/starBliss
-        - BjnNowak/bertin
-        - briatte/ggnet
-        - bwanniarachchige2/ggtwotone
-        - coolbutuseless/ggsvg
-        - davidsjoberg/ggsankey
-        - davidsjoberg/ggstream
-        - diegovalle/mxmaps
-        - dill/emoGG
-        - dxsbiocc/ggideogram
-        - dzhang32/ggtranscript
-        - eliocamp/ggpercentogram
-        - ellisp/ggseas/pkg
-        - emilhvitfeldt/ggrandom
-        - EvaMaeRey/ggcalendar
-        - EvaMaeRey/ggols
-        - EvaMaeRey/ggstamp
-        - gadenbuie/ggweekly
-        - garretrc/ggvoronoi
-        - gnoblet/ggbranding
-        - giocomai/ganttrify
-        - hrbrmstr/ggcounty
-        - hrbrmstr/ggeconodist
-        - hrbrmstr/ggsolar
-        - hughjonesd/ggmagnify
-        - Hy4m/ggvwline
-        - i2z1/ggonion
-        - inbo/effectclass
-        - jared-fowler/prettyglm
-        - jasonwong-lab/gghic
-        - Jiawang1209/ggNetView
-        - jimjam-slam/ggflags
-        - jhrcook/ggasym
-        - jfjelstul/eumaps
-        - junjunlab/jjAnno
-        - kenithgrey/ggQC
-        - leonardojo/ggPlantmap
-        - liamgilbey/ggwaffle
-        - MarcellGranat/ggProfessional
-        - MattCowgill/ggdirectlabel
-        - mrjoh3/ggtrack
-        - nacnudus/ggbillboard
-        - nacnudus/ggstraw
-        - nevrome/ggpointgrid
-        - nsgrantham/ggbraid
-        - openpharma/visR
-        - paezha/truchet
-        - R-CoderDotCom/ggcats
-        - r-link/corrmorant
-        - ricardo-bion/ggradar
-        - rkabacoff/ggpie
-        - Sayani07/gghdr
-        - sctyner/geomnet
-        - sharlagelfand/ggkeyboard
-        - teunbrand/ggplateplot
-        - tgerke/ggconsort
-        - tdaverse/ggtda
-        - UrbanInstitute/urbnmapr
-        - yanpd01/ggsector
-        - yutannihilation/ggsflabel
-        - zmeers/ggparliament
+        - "AakaashRao/starbility": starbility
+        - "Ather-Energy/ggTimeSeries": ggTimeSeries
+        - "benyamindsmith/mapBliss": mapBliss
+        - "benyamindsmith/starBliss": starBliss
+        - "BjnNowak/bertin": bertin
+        - "briatte/ggnet": ggnet
+        - "bwanniarachchige2/ggtwotone": ggtwotone
+        - "coolbutuseless/ggsvg": ggsvg
+        - "davidsjoberg/ggsankey": ggsankey
+        - "davidsjoberg/ggstream": ggstream
+        - "diegovalle/mxmaps": mxmaps
+        - "dill/emoGG": emoGG
+        - "dxsbiocc/ggideogram": ggideogram
+        - "dzhang32/ggtranscript": ggtranscript
+        - "eliocamp/ggpercentogram": ggpercentogram
+        - "ellisp/ggseas/pkg": ggseas
+        - "emilhvitfeldt/ggrandom": ggrandom
+        - "EvaMaeRey/ggcalendar": ggcalendar
+        - "EvaMaeRey/ggols": ggols
+        - "EvaMaeRey/ggstamp": ggstamp
+        - "gadenbuie/ggweekly": ggweekly
+        - "garretrc/ggvoronoi": ggvoronoi
+        - "gnoblet/ggbranding": ggbrandin
+        - "giocomai/ganttrify": ganttrify
+        - "hrbrmstr/ggcounty": ggcounty
+        - "hrbrmstr/ggeconodist": ggeconodist
+        - "hrbrmstr/ggsolar": ggsolar
+        - "hughjonesd/ggmagnify": ggmagnify
+        - "Hy4m/ggvwline": ggvwline
+        - "i2z1/ggonion": ggonion
+        - "inbo/effectclass": effectclass
+        - "jared-fowler/prettyglm": prettyglm
+        - "jasonwong-lab/gghic": gghic
+        - "Jiawang1209/ggNetView": ggNetView
+        - "jimjam-slam/ggflags": ggflags
+        - "jhrcook/ggasym": ggasym
+        - "jfjelstul/eumaps": eumaps
+        - "junjunlab/jjAnno": jjAnno
+        - "kenithgrey/ggQC": ggQC
+        - "leonardojo/ggPlantmap": ggPlantmap
+        - "liamgilbey/ggwaffle": ggwaffle
+        - "MarcellGranat/ggProfessional": ggProfessional
+        - "MattCowgill/ggdirectlabel": ggdirectlabel
+        - "mrjoh3/ggtrack": ggtrack
+        - "nacnudus/ggbillboard": ggbillboard
+        - "nacnudus/ggstraw": ggstraw
+        - "nevrome/ggpointgrid": ggpointgrid
+        - "nsgrantham/ggbraid": ggbraid
+        - "openpharma/visR": visR
+        - "paezha/truchet": truchet
+        - "R-CoderDotCom/ggcats": ggcats
+        - "r-link/corrmorant": corrmorant
+        - "ricardo-bion/ggradar": ggradar
+        - "rkabacoff/ggpie": ggpie
+        - "Sayani07/gghdr": gghdr
+        - "sctyner/geomnet": geomnet
+        - "sharlagelfand/ggkeyboard": ggkeyboard
+        - "teunbrand/ggplateplot": ggplateplot
+        - "tgerke/ggconsort": ggconsort
+        - "tdaverse/ggtda": ggtda
+        - "UrbanInstitute/urbnmapr": urbnmapr
+        - "yanpd01/ggsector": ggsector
+        - "yutannihilation/ggsflabel": ggsflabel
+        - "zmeers/ggparliament": ggparliament
       # Plotting - color maps, layouts, scales, etc
-        - ashgreat/roughVizR
-        - bbc/bbplot
-        - BlakeRMills/MoMAColors
-        - clauswilke/ggtextures
-        - coolbutuseless/facetious
-        - datacamp/ggdc
-        - delabj/ggCyberPunk
-        - dracula/dRacula
-        - EdwinTh/dutchmasters
-        - ekholme/blueycolors
-        - friendly/ggCheysson
-        - gadenbuie/ggpomological
-        - Greater-London-Authority/gglaplot
-        - jbgb13/peRReo
-        - Jiawang1209/ggSketch
-        - johannesbjork/LaCroixColoR
-        - johnmackintosh/rockthemes
-        - junqueiragaabi/ButterflyColors
-        - kaizadp/soilpalettes
-        - MatthewBJane/ThemePark
-        - Mikata-Project/ggthemr
-        - mjskay/ggblend
-        - olihawkins/pilot
-        - R-CoderDotCom/cyberpunk
-        - RestlessTail/ggGenshin
-        - ricardo-bion/ggtech
-        - Ryo-N7/tvthemes
-        - sharlagelfand/ggcute
-        - teunbrand/ggchromatic
-        - thomas-neitmann/mdthemes
-        - UrbanInstitute/urbnthemes
-        - xvrdm/ggrough
-        - xvzftube/darknerdthemes
-        - yjunechoe/ggcolormeter
+        - "ashgreat/roughVizR": roughVizR
+        - "bbc/bbplot": bbplot
+        - "BlakeRMills/MoMAColors": MoMAColors
+        - "clauswilke/ggtextures": ggtextures
+        - "coolbutuseless/facetious": facetious
+        - "datacamp/ggdc": ggdc
+        - "delabj/ggCyberPunk": ggCyberPunk
+        - "dracula/dRacula": dRacula
+        - "EdwinTh/dutchmasters": dutchmasters
+        - "ekholme/blueycolors": blueycolors
+        - "friendly/ggCheysson": ggCheysson
+        - "gadenbuie/ggpomological": ggpomological
+        - "Greater-London-Authority/gglaplot": gglaplot
+        - "jbgb13/peRReo": peRReo
+        - "Jiawang1209/ggSketch": ggSketch
+        - "johannesbjork/LaCroixColoR": LaCroixColoR
+        - "johnmackintosh/rockthemes": rockthemes
+        - "junqueiragaabi/ButterflyColors": ButterflyColors
+        - "kaizadp/soilpalettes": soilpalettes
+        - "MatthewBJane/ThemePark": ThemePark
+        - "Mikata-Project/ggthemr": ggthemr
+        - "mjskay/ggblend": ggblend
+        - "olihawkins/pilot": pilot
+        - "R-CoderDotCom/cyberpunk": cyberpunk
+        - "RestlessTail/ggGenshin": ggGenshin
+        - "ricardo-bion/ggtech": ggtech
+        - "Ryo-N7/tvthemes": tvthemes
+        - "sharlagelfand/ggcute": ggcute
+        - "teunbrand/ggchromatic": ggchromatic
+        - "thomas-neitmann/mdthemes": mdthemes
+        - "UrbanInstitute/urbnthemes": urbnthemes
+        - "xvrdm/ggrough": ggrough
+        - "xvzftube/darknerdthemes": darknerdthemes
+        - "yjunechoe/ggcolormeter": ggcolormeter
       # Plotting - 3D
-        - coolbutuseless/cryogenic
-        - coolbutuseless/devout
-        - coolbutuseless/devoutrgl
-        - coolbutuseless/snowcrash
-        - coolbutuseless/ggreverse
-        - coolbutuseless/ggrgl
-        - coolbutuseless/ggthreed
-        - coolbutuseless/threed
-        - coolbutuseless/triangular
+        - "coolbutuseless/cryogenic": cryogenic
+        - "coolbutuseless/devout": devout
+        - "coolbutuseless/devoutrgl": devoutrgl
+        - "coolbutuseless/snowcrash": snowcrash
+        - "coolbutuseless/ggreverse": ggreverse
+        - "coolbutuseless/ggrgl": ggrgl
+        - "coolbutuseless/ggthreed":  ggthreed
+        - "coolbutuseless/threed": threed
+        - "coolbutuseless/triangular": triangular
       # Plotting - interactive
-        - AliciaSchep/gglabeller
-        - MattCowgill/ggannotate
-        - Roche/ggtips
-        - terrytangyuan/autoplotly
+        - "AliciaSchep/gglabeller": gglabeller
+        - "MattCowgill/ggannotate": ggannotate
+        - "Roche/ggtips": ggtips
+        - "terrytangyuan/autoplotly": autoplotly
       # Data
-        - hodgettsp/cesR
-        - mountainmath/canbank
-        - mountainmath/CanCovidData
-        - mountainmath/canpumf
-        - mountainmath/statcanXtabs
-        - paleolimbot/rcanvec
-        - ropensci/weathercan
+        - "hodgettsp/cesR": cesR
+        - "mountainmath/canbank": canbank
+        - "mountainmath/CanCovidData": CanCovidData
+        - "mountainmath/canpumf": canpumf
+        - "mountainmath/statcanXtabs": statcanXtabs
+        - "paleolimbot/rcanvec": rcanvec
+        - "ropensci/weathercan": weathercan
       gitlab:
-        - hrbrmstr/ggchicklet
-        - medbio/disgenet2r
+        - "hrbrmstr/ggchicklet": ggchicklet
+        - "medbio/disgenet2r": disgenet2r
   deprecated:
     source:
       cran:

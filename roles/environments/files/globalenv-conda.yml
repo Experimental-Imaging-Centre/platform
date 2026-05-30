@@ -35,7 +35,7 @@ dependencies:
   - ipywidgets
   - biopython
 # Spyder dependencies
-  - spyder-kernels
+  - spyder-kernels>=3.1.0,<3.2.0
   - alabaster
   - astroid
   - asyncssh
@@ -106,6 +106,7 @@ dependencies:
   - whatthepatch
   - yapf
 # Helper packages
+  - autoflake
   - bcrypt
   - cffi
   - configparser
@@ -128,9 +129,11 @@ dependencies:
   - six
   - tenacity
   - tqdm
+  - ty
   - typer
 # Parallel
   - pathos
+  - pyinfra
   - qbatch
 #  - scoop
   - uproot
@@ -188,10 +191,17 @@ dependencies:
 # Natural language processing
   - lark
   - nltk
-# AV processing
+# AV processing and data streaming
+  - av
   - ffmpeg-python
   - imageio-ffmpeg
+  - ipywebrtc
   - opencv
+  - moviepy
+  - pyaudio
+  - python-sounddevice
+  - webrtcvad
+  - xwebrtc
 # Data structures
   - anytree
   - awkward
@@ -245,6 +255,7 @@ dependencies:
   - flask
   - pyro4
   - requests
+  - streamlit
   - urllib3
   - websockets
   - websocket-client
@@ -323,6 +334,7 @@ dependencies:
   - r-pbapply
   - r-rcpp
   - r-recipes
+  - r-remotes
   - r-rlang
   - r-svunit
   - r-systemfonts
@@ -436,7 +448,6 @@ dependencies:
   - r-optimparallel
   - r-optimx
   - r-quadprog
-  - r-rcpp
   - r-rcppannoy
   - r-rfast
 # Imputation, cleaning, matching, harmonization
