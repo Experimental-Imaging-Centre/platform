@@ -1,7 +1,12 @@
----
+--- # positron
+
 ##################################################################################
 # Positron
 ##################################################################################
+
+####################################
+# Get vars and set paths
+####################################
 
 # Get vars from roles' vars/ directory
 - name: Get package information
@@ -10,36 +15,74 @@
 
 - name: Set task variables
   ansible.builtin.set_fact:
-    package_name: "{{ package.name }}"
-    package_version: "{{ package.version }}"
-    package_arch: "{{ package.arch }}"
-    package_os: "{{ package.os }}"
-    package_pkg: "{{ package.pkg }}"
-    package_base_url: "{{ package.base_url }}"
-    package_checksum: "{{ package.checksum }}"
-    base_path: "{{ local_path }}/software/{{ package.name }}/{{ package.version }}"
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    package_arch: "{{ package.src.arch }}"
+    package_os: "{{ package.src.os }}"
+    package_pkg: "{{ package.src.pkg }}"
+    package_base_url: "{{ package.src.base_url }}"
+    package_checksum: "{{ package.src.checksum }}"
+    base_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
 
 - name: Set download link
   ansible.builtin.set_fact:
     package_url: "{{ package_base_url }}/{{ package_os }}/{{ package_arch }}/Positron-{{ package_version }}-{{ package_arch | replace('x86_', 'x') }}.{{ package_pkg }}"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ base_path }}/install/positron"
+    expected_binary_bin: "{{ base_path }}/install/bin/positron"
+    expected_chrome_sandbox: "{{ base_path }}/install/chrome-sandbox"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+- name: Check if expected files exist for idempotency (binary in bin)
+  ansible.builtin.stat:
+    path: "{{ expected_binary_bin }}"
+  register: check_exists_expected_binary_bin
+
+- name: Check if expected files exist for idempotency (chrome sandbox)
+  ansible.builtin.stat:
+    path: "{{ expected_chrome_sandbox }}"
+  register: check_exists_expected_chrome_sandbox
+
+####################################
+# Download package
+####################################
 
 - name: Create temporary directory to download package archive
   ansible.builtin.tempfile:
     state: directory
     suffix: build
   register: temp_dir
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_bin.stat.exists
+    - not check_exists_expected_chrome_sandbox.stat.exists
 
 - name: Download the package archive with SHA256 verification
   ansible.builtin.get_url:
     url: "{{ package_url }}"
     dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
     checksum: "{{ package_checksum }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_bin.stat.exists
+    - not check_exists_expected_chrome_sandbox.stat.exists
+
+####################################
+# Extract / install package
+####################################
 
 - name: Create package install location
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ software_user }}"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ base_path }}/install"
@@ -49,17 +92,22 @@
     dpkg -x "{{ temp_dir.path }}/{{ package_url | basename }}" "{{ temp_dir.path }}"
   args:
     creates: "{{ temp_dir.path }}/usr/share/positron"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_bin.stat.exists
+    - not check_exists_expected_chrome_sandbox.stat.exists
 
 - name: Install the package
   ansible.builtin.copy:
     src: "{{ temp_dir.path }}/usr/share/positron/"
     dest: "{{ base_path }}/install"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     remote_src: yes
-
-- name: Cleanup temporary directory
-  ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
-    state: absent
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_bin.stat.exists
+    - not check_exists_expected_chrome_sandbox.stat.exists
 
 # Fix chrome/electron permissions for sandboxing
 - name: Set chrome/electron sandboxing permissions
@@ -70,23 +118,38 @@
     group: root
     mode: "4755"
 
+####################################
+# Cleanup
+####################################
+
+- name: Cleanup temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
+
+####################################
+# Install module
+####################################
+
 - name: Install module
   ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
   vars:
     module:
       module:
         category: "Module"
         vars:
-          - module_name: "'{{ package_name }}'"
-          - module_version: "'{{ package_version }}'"
-          - module_description: "'IDE for R and Python'"
-          - module_help: {"[[ IDE for data science, supporting the R and Python programming languages ]]" : str}
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
         funcs:
-          - whatis: ["Name" : str, module_name]
-          - whatis: ["Version" : str, module_version]
-          - whatis: ["Description" : str, module_description]
+          - whatis: [ module_description ]
           - help: [ module_help ]
       conflicts:
         category: "Conflicts"
@@ -111,11 +174,15 @@
   ansible.builtin.file:
     path: "{{ local_path }}/modulefiles/{{ package_name }}/"
     state: directory
-    mode: '0755'
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
 
 - name: Link module - create symlink
   ansible.builtin.file:
     src: "{{ base_path }}/module.lua"
     dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     state: link
 

@@ -1,46 +1,95 @@
----
+--- # spyder
+
 ##################################################################################
 # Spyder
 ##################################################################################
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure micromamba binary is present"
+  ansible.builtin.import_role:
+    name: environments
+    tasks_from: micromamba.yml
+    vars_from: main.yml
+
+####################################
+# Get variables and set task variables/paths
+####################################
 
 # Get vars from roles' vars/ directory
 - name: Get package information
   ansible.builtin.set_fact:
     package: "{{ spyder.package }}"
+    condaenv: "{{ spyder.condaenv }}"
 
 - name: Set task variables
   ansible.builtin.set_fact:
-    package_name: "{{ package.name }}"
-    package_version: "{{ package.version }}"
-    package_arch: "{{ package.arch }}"
-    package_os: "{{ package.os }}"
-    package_base_url: "{{ package.base_url }}"
-    package_checksum: "{{ package.checksum }}"
-    base_path: "{{ environments_path }}/dependencies/{{ package.name }}/{{ package.version }}"
-    install_path: "{{ local_path }}/software/{{ package.name }}/{{ package.version }}"
+    environment_name: "{{ condaenv.info.name }}"
+    environment_version: "{{ condaenv.info.version }}"
+    environment_type: "{{ condaenv.info.type }}"
+    base_path: "{{ environments_path }}/{{ condaenv.info.type }}/{{ package.info.name }}/{{ package.info.version }}"
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    package_arch: "{{ package.src.arch }}"
+    package_os: "{{ package.src.os }}"
+    package_base_url: "{{ package.src.base_url }}"
+    package_checksum: "{{ package.src.checksum }}"
+    install_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
 
 - name: Set download link
   ansible.builtin.set_fact:
     package_url: "{{ package_base_url }}/v{{ package_version }}/Spyder-{{ package_os }}-{{ package_arch }}.sh"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ base_path }}/env/envs/spyder-runtime/bin/spyder"
+    expected_binary_link: "{{ install_path }}/install/bin/spyder"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+- name: Check if expected files exist for idempotency (installed binary link)
+  ansible.builtin.stat:
+    path: "{{ expected_binary_link }}"
+  register: check_exists_expected_binary_link
+
+####################################
+# Download package
+####################################
 
 - name: Create temporary directory to download package archive
   ansible.builtin.tempfile:
     state: directory
     suffix: build
   register: temp_dir
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
 
 - name: Download the package archive with SHA256 verification
   ansible.builtin.get_url:
     url: "{{ package_url }}"
     dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
     checksum: "{{ package_checksum }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+
+####################################
+# Extract / install package
+####################################
 
 # Dependency environment
 - name: Create package environment location
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ software_user }}"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ base_path }}"
@@ -49,23 +98,17 @@
   ansible.builtin.command:
     cmd: "/bin/bash {{ temp_dir.path }}/{{ package_url | basename }} -b -s -m -p {{ base_path }}/env"
     creates: "{{ base_path }}/env/envs/spyder-runtime/bin/spyder"
-
-- name: Remove uninstaller template
-  ansible.builtin.file:
-    path: "{{ base_path }}/env/uninstall-spyder.sh"
-    state: absent
-
-- name: Cleanup temporary directory
-  ansible.builtin.file:
-    path: "{{ temp_dir.path }}"
-    state: absent
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
 
 # Package install by symlinking binary in
 - name: Create package install location
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ software_user }}"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ install_path }}/install/bin"
@@ -74,26 +117,54 @@
   ansible.builtin.file:
     src: "{{ base_path }}/env/envs/spyder-runtime/bin/spyder"
     dest: "{{ install_path }}/install/bin/spyder"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     state: link
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+
+####################################
+# Cleanup
+####################################
+
+- name: Remove uninstaller template
+  ansible.builtin.file:
+    path: "{{ base_path }}/env/uninstall-spyder.sh"
+    state: absent
+  when:
+    - check_exists_expected_binary.stat.exists
+    - check_exists_expected_binary_link.stat.exists
+
+- name: Cleanup temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
+
+####################################
+# Install module
+####################################
 
 # Modules
 - name: Install dependency module
   ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rw,g=r,o=r
   vars:
     module:
       module:
         category: "Module"
         vars:
-            - module_name: "'{{ package_name }}'"
-            - module_version: "'{{ package_version }}'"
-            - module_description: "'Dependency environment for {{ package_name }}/{{ package_version }}'"
-            - module_help: {"[[ Dependency environment for {{ package_name }}/{{ package_version }}. This module exists as a helper tool, but you only need to load the package's (){{ package_name }}/{{ package_version }}) environment to have access to that. ]]" : str}
+          - module_name: "'{{ condaenv.info.name }}'"
+          - module_version: "'{{ condaenv.info.version }}'"
+          - module_description: "'{{ condaenv.module.description }}'"
+          - module_help: "'{{ condaenv.module.help }}'"
         funcs:
-          - whatis: ["Name" : str, module_name]
-          - whatis: ["Version" : str, module_version]
-          - whatis: ["Description" : str, module_description]
+          - whatis: [ module_description ]
           - help: [ module_help ]
       conflicts:
         category: "Conflicts"
@@ -120,33 +191,38 @@
 
 - name: Link dependency module - ensure directory is present
   ansible.builtin.file:
-    path: "{{ environments_path }}/modulefiles/dependencies/{{ package_name }}/"
+    path: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/"
     state: directory
-    mode: '0755'
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
 
 - name: Link dependency module - create symlink
   ansible.builtin.file:
     src: "{{ base_path }}/module.lua"
-    dest: "{{ environments_path }}/modulefiles/dependencies/{{ package_name }}/{{ package_version }}.lua"
+    dest: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/{{ environment_version }}.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
     state: link
 
 - name: Install package module
   ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ install_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
   vars:
     module:
       module:
         category: "Module"
         vars:
-          - module_name: "'{{ package_name }}'"
-          - module_version: "'{{ package_version }}'"
-          - module_description: "'IDE for the Python programming language'"
-          - module_help: {"[[ Spyder is an IDE for the Python programming language ]]" : str}
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
         funcs:
-          - whatis: ["Name" : str, module_name]
-          - whatis: ["Version" : str, module_version]
-          - whatis: ["Description" : str, module_description]
+          - whatis: [ module_description ]
           - help: [ module_help ]
       conflicts:
         category: "Conflicts"
@@ -161,11 +237,15 @@
   ansible.builtin.file:
     path: "{{ local_path }}/modulefiles/{{ package_name }}/"
     state: directory
-    mode: '0755'
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
 
 - name: Link package module - create symlink
   ansible.builtin.file:
     src: "{{ install_path }}/module.lua"
     dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     state: link
 

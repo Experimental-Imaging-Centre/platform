@@ -1,7 +1,31 @@
 ---
 
-- {import_tasks: rstudio.yml, tags: rstudio}
-- {import_tasks: spyder.yml, tags: spyder}
-- {import_tasks: pycharm.yml, tags: pycharm}
-- {import_tasks: positron.yml, tags: positron}
+- import_tasks: "rstudio.yml"
+  tags: rstudio
+    - "local"
+    - "ide"
+    - "rstudio"
 
+- import_tasks: "spyder.yml"
+  tags:
+    - "local"
+    - "ide"
+    - "spyder"
+
+- import_tasks: "pycharm.yml"
+  tags:
+    - "local"
+    - "ide"
+    - "pycharm"
+
+- import_tasks: "positron.yml"
+  tags:
+    - "local"
+    - "ide"
+    - "positron"
+
+- import_tasks: "itksnap.yml"
+  tags:
+    - "local"
+    - "visualization"
+    - "itksnap"

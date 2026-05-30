@@ -1,7 +1,12 @@
----
+--- # pycharm
+
 ##################################################################################
 # Pycharm
 ##################################################################################
+
+####################################
+# Get vars and set paths
+####################################
 
 # Get vars from roles' vars/ directory
 - name: Get package information
@@ -10,13 +15,13 @@
 
 - name: Set task variables
   ansible.builtin.set_fact:
-    package_name: "{{ package.name }}"
-    package_version: "{{ package.version }}"
-    package_arch: "{{ package.arch }}"
-    package_os: "{{ package.os }}"
-    package_base_url: "{{ package.base_url }}"
-    package_checksum: "{{ package.checksum }}"
-    base_path: "{{ local_path }}/software/{{ package.name }}/{{ package.version }}"
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    package_arch: "{{ package.src.arch }}"
+    package_os: "{{ package.src.os }}"
+    package_base_url: "{{ package.src.base_url }}"
+    package_checksum: "{{ package.src.checksum }}"
+    base_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
 
 - name: Set download link (no arch)
   ansible.builtin.set_fact:
@@ -28,23 +33,54 @@
     package_url: "{{ package_base_url }}/pycharm-{{ package_version }}-{{ package_arch}}.tar.gz"
   when: package_arch | default('') | length > 0
 
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ base_path }}/install/pycharm"
+    expected_shell_script: "{{ base_path }}/install/bin/pycharm.sh"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+- name: Check if expected files exist for idempotency (shell script)
+  ansible.builtin.stat:
+    path: "{{ expected_shell_script }}"
+  register: check_exists_expected_shell_script
+
+
+####################################
+# Download package
+####################################
+
 - name: Create temporary directory to download package archive
   ansible.builtin.tempfile:
     state: directory
     suffix: build
   register: temp_dir
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_shell_script.stat.exists
 
 - name: Download the package archive with SHA256 verification
   ansible.builtin.get_url:
     url: "{{ package_url }}"
     dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
     checksum: "{{ package_checksum }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_shell_script.stat.exists
+
+####################################
+# Extract / install package
+####################################
 
 - name: Create package install location
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ software_user }}"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ base_path }}/install"
@@ -54,32 +90,46 @@
     src: "{{ temp_dir.path }}/{{ package_url | basename }}"
     dest: "{{ base_path }}/install"
     creates: "{{ base_path }}/install/bin/pycharm"
-    owner: "{{ software_user }}"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     remote_src: yes
     extra_opts: [--strip-components=1,--no-same-owner]
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_shell_script.stat.exists
+
+####################################
+# Cleanup
+####################################
 
 - name: Cleanup temporary directory
   ansible.builtin.file:
     path: "{{ temp_dir.path }}"
     state: absent
+  when: temp_dir.path is defined
+
+####################################
+# Install module
+####################################
 
 - name: Install module
   ansible.builtin.template:
     src: templates/modulefile.j2
     dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
   vars:
     module:
       module:
         category: "Module"
         vars:
-          - module_name: "'{{ package_name }}'"
-          - module_version: "'{{ package_version }}'"
-          - module_description: "'IDE for the Python programming language'"
-          - module_help: {"[[ PyCharm is an IDE for the Python programming language. ]]" : str}
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
         funcs:
-          - whatis: ["Name" : str, module_name]
-          - whatis: ["Version" : str, module_version]
-          - whatis: ["Description" : str, module_description]
+          - whatis: [ module_description ]
           - help: [ module_help ]
       conflicts:
         category: "Conflicts"
@@ -94,10 +144,14 @@
   ansible.builtin.file:
     path: "{{ local_path }}/modulefiles/{{ package_name }}/"
     state: directory
-    mode: '0755'
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
 
 - name: Link module - create symlink
   ansible.builtin.file:
     src: "{{ base_path }}/module.lua"
     dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
     state: link

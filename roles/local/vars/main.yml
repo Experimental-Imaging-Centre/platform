@@ -4,54 +4,140 @@
 # Latest package definitions
 ############################
 
-rstudio:
+blender:
   package:
-    name: "rstudio"
-    version: "2026.04.0-526"
-    arch: "amd64"
-    os: "debian"
-    target: "jammy"
-    base_url: "https://download1.rstudio.org/electron"
-    checksum: "sha256:d2f6892cce4b4b894b7cfc7847e0e1ecfc31d9946ac7a5925c3584f49ccfd57b"
+    info:
+      name: "blender"
+      version: "5.1.1"
+    src:
+      arch: "x64"
+      os: "linux"
+      base_url: "https://download.blender.org/release"
+      checksum: "sha256:6f9fff89fef154ef7974d1a1c4b916ab4bc1f5618bcb48d5befee1bd0a7c7f2a"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "3D computer graphics software"
+      help: "Blender is a free and open-source 3D computer graphics software suite. It is used for general 3D modeling, animation, digital sculpting, visual effects, rendering, compositing, motion tracking, drawing, 2D animation and video editing. It is widely used to create animated films, visual effects, art, 3D-printed models, motion graphics, interactive 3D applications, virtual reality, and 3D models for video games."
 
-spyder:
+itksnap:
   package:
-    name: "spyder"
-    version: "6.1.4"
-    arch: "x86_64"
-    os: "Linux"
-    base_url: "https://github.com/spyder-ide/spyder/releases/download"
-    checksum: "sha256:3cbb6e9c78a48e316c792fc2aca7bb3acf0d23d2f9b0315c73aee123dff2acda"
-
-pycharm:
-  package:
-    name: "pycharm"
-    version: "2026.1"
-    arch: ""
-    os: "Linux"
-    base_url: "https://download.jetbrains.com/python"
-    checksum: "sha256:6405985fe82bc6a419005388930cbe318b7419b82cb09c8494035a2be8511b0f"
+    info:
+      name: "itk-snap"
+      version: "4.4.0"
+    src:
+      version_build: "20250909"
+      arch: "x86_64"
+      os: "Linux"
+      base_url: "https://downloads.sourceforge.net/project"
+      checksum: "sha1:c4ff76e838fb28a79df9157a27e2bbf2eca3b4c6"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Medical image viewer and segmentation tool"
+      help: "ITK-SNAP is an interactive software application that allows users to navigate three-dimensional medical images, manually delineate anatomical regions of interest, and perform automatic image segmentation. The software was designed with the audience of clinical and basic science researchers in mind, and emphasis has been placed on having a user-friendly interface and maintaining a limited feature set to prevent feature creep. ITK-SNAP is most frequently used to work with magnetic resonance imaging (MRI), cone-beam computed tomography (CBCT) and computed tomography (CT) data sets."
 
 positron:
   package:
-    name: "positron"
-    version: "2026.04.1-10"
-    arch: "x86_64"
-    os: "deb"
-    pkg: "deb"
-    base_url: "https://cdn.posit.co/positron/releases"
-    checksum: "sha256:491cef95f76ea967e73606e07a59ca46361ea9161906a9a360762c310f9e862b"
+    info:
+      name: "positron"
+      version: "2026.04.1-10"
+    src:
+      arch: "x86_64"
+      os: "deb"
+      pkg: "deb"
+      base_url: "https://cdn.posit.co/positron/releases"
+      checksum: "sha256:491cef95f76ea967e73606e07a59ca46361ea9161906a9a360762c310f9e862b"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "IDE for R and Python programming languages"
+      help: "Positron is an IDE built for Python and R. It combines the power of a full-featured IDE with interactive data science tools for Python and R."
+
+pycharm:
+  package:
+    info:
+      name: "pycharm"
+      version: "2026.1"
+    src:
+      arch: ""
+      os: "Linux"
+      base_url: "https://download.jetbrains.com/python"
+      checksum: "sha256:6405985fe82bc6a419005388930cbe318b7419b82cb09c8494035a2be8511b0f"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "IDE for the Python programming language"
+      help: "PyCharm is an integrated development environment (IDE) used for programming in Python. It provides code analysis, a graphical debugger, an integrated unit tester, integration with version control systems, and supports web development with Django."
+
+rstudio:
+  package:
+    info:
+      name: "rstudio"
+      version: "2026.04.0-526"
+    src:
+      arch: "amd64"
+      os: "debian"
+      target: "jammy"
+      base_url: "https://download1.rstudio.org/electron"
+      checksum: "sha256:d2f6892cce4b4b894b7cfc7847e0e1ecfc31d9946ac7a5925c3584f49ccfd57b"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "IDE for the R programming language"
+      help: "RStudio IDE is an integrated development environment for R, a programming language for statistical computing and graphics."
+
+spyder:
+  package:
+    info:
+      name: "spyder"
+      version: "6.1.4"
+    src:
+      arch: "x86_64"
+      os: "Linux"
+      base_url: "https://github.com/spyder-ide/spyder/releases/download"
+      checksum: "sha256:3cbb6e9c78a48e316c792fc2aca7bb3acf0d23d2f9b0315c73aee123dff2acda"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "IDE for the Python programming language"
+      help: "Spyder is an open-source cross-platform integrated development environment (IDE) for scientific programming in the Python language. Spyder integrates with a number of prominent packages in the scientific Python stack, as well as other open-source software."
+  condaenv:
+    info:
+      name: "spyder"
+      version: "6.1.4"
+      type: "dependencies"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Dependency environment for spyder/6.1.4. Load spyder/6.1.4 to use that service instead."
+      help: "A dependency environment for spyder/6.1.4. This is a helper module. You only need to load spyder/6.1.4 to use that service. Do not use this module unless you know what you are doing."
 
 ############################
 # Old package definitions
 ############################
 
-"rstudio_2026.01.1-403":
+rstudio_2026_01_1_403:
   package:
-    name: "rstudio"
-    version: "2026.01.1-403"
-    arch: "amd64"
-    os: "debian"
-    target: "jammy"
-    base_url: "https://download1.rstudio.org/electron"
-    checksum: "sha256:b1684c4368f510b3ddb65f692b30f3352bbef9d5c25aa67cf461341c811923aa"
+    info:
+      name: "rstudio"
+      version: "2026.01.1-403"
+    src:
+      arch: "amd64"
+      os: "debian"
+      target: "jammy"
+      base_url: "https://download1.rstudio.org/electron"
+      checksum: "sha256:b1684c4368f510b3ddb65f692b30f3352bbef9d5c25aa67cf461341c811923aa"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "IDE for the R programming language"
+      help: "RStudio IDE is an integrated development environment for R, a programming language for statistical computing and graphics."
