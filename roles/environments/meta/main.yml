@@ -1,4 +1,0 @@
---- # Mamba dependency
-
-dependencies:
-  - role: mambaorg.micromamba
