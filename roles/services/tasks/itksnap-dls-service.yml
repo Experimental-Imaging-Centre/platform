@@ -1,0 +1,141 @@
+--- # itksnap-dls
+
+##################################################################################
+# ITK-SNAP DLS service
+##################################################################################
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure the itksnap-dls dependency environment is present"
+  ansible.builtin.import_role:
+    name: environments
+    tasks_from: itksnap-dls.yml
+
+####################################
+# Get vars and set paths
+####################################
+
+# Get vars from roles' vars/ directory
+- name: Get package/environment information
+  ansible.builtin.set_fact:
+    package: "{{ itksnap_dls_service.package }}"
+    service: "{{ itksnap_dls_service.service }}"
+    systemd: "{{ itksnap_dls_service.systemd }}"
+
+# Set task vars
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    base_path: "{{ services_path }}/servers/{{ package.info.name }}/{{ package.info.version }}"
+
+####################################
+# Create server script
+####################################
+
+# Create directories
+- name: Create package install location
+  become_user: root
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+  loop:
+    - "{{ base_path }}/install/bin"
+
+- name: Create wrapper script
+  ansible.builtin.copy:
+    dest: "{{ base_path }}/install/bin/{{ package.script.filename }}"
+    content: |
+      #!/bin/bash
+
+      {{ package.script.exec }}
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwx,g=rx,o=rx
+
+####################################
+# Install module
+####################################
+
+# Modules
+- name: Install package module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      requires:
+        category: "Requires"
+        funcs:
+          - depends_on: [ "'dependencies/itksnap-dls/0.1.2'" ]
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+
+- name: Link package module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ services_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link package module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ services_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link
+
+####################################
+# Install systemd service
+####################################
+
+# Modules
+- name: Install systemd service
+  become: true
+  become_user: root
+  ansible.builtin.template:
+    src: templates/service.j2
+    dest: "{{ systemd.service_filename }}"
+    owner: "{{ systemd.owner.user }}"
+    group: "{{ systemd.owner.group }}"
+    mode: u=rw,g=r,o=r
+
+####################################
+# Enable systemd service
+####################################
+
+- name: Enable service httpd and ensure it is not masked
+  become: true
+  become_user: root
+  ansible.builtin.systemd_service:
+    name: "{{ systemd.service_filename | basename }}"
+    enabled: true
+    state: started
+
+

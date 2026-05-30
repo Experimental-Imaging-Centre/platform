@@ -1,0 +1,40 @@
+---
+
+############################
+# Latest service definitions
+############################
+
+itksnap_dls_service:
+  package:
+    info:
+      name: "itksnap-dls-service"
+      version: "0.1.2"
+    script:
+      filename: "itksnap-dls-server"
+      exec: "/opt/environments/dependencies/itksnap-dls/0.1.2/env/bin/python -m itksnap_dls"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "ITK-SNAP DLS server"
+      help: "ITK-SNAP deep learning segmentation server required to use ITK-SNAP (>4.4.0) AI segmentation features."
+  systemd:
+    service_filename: "/etc/systemd/system/itksnap-dls-server.service"
+    timer_filename:
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+  service:
+    Unit:
+      Description: "ITK-SNAP DLS server"
+      After: "network.target"
+    Service:
+      Type: "exec"
+      User: "{{ research_service_servers_user }}"
+      Group: "{{ research_service_servers_user }}"
+      ExecStart: "/opt/environments/dependencies/itksnap-dls/0.1.2/env/bin/python -m itksnap_dls"
+      Restart: "on-failure"
+      RestartSec: "5s"
+    Install:
+      WantedBy: "multi-user.target"
+
