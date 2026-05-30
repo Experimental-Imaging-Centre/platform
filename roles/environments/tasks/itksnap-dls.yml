@@ -1,0 +1,195 @@
+--- # itksnap-dls
+
+##################################################################################
+# ITK-SNAP DLS dependencies environment
+##################################################################################
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure micromamba binary is present"
+  ansible.builtin.include_tasks: micromamba.yml
+
+####################################
+# Get vars and set paths
+####################################
+
+# Get vars from roles' vars/ directory
+- name: Get package/environment information
+  ansible.builtin.set_fact:
+    condaenv: "{{ itksnap_dls.condaenv }}"
+
+- name: Debug
+  ansible.builtin.debug:
+    msg: "{{ condaenv.owner.user }} | {{ condaenv.owner.group }} | {{ software_user }}"
+
+# Set task vars
+- name: Set task variables
+  ansible.builtin.set_fact:
+    environment_name: "{{ condaenv.info.name }}"
+    environment_version: "{{ condaenv.info.version }}"
+    environment_type: "{{ condaenv.info.type }}"
+
+# Get environment path
+- name: Defining environment path
+  ansible.builtin.set_fact:
+    base_path: "{{ environments_path }}/{{ environment_type }}/{{ environment_name }}/{{ environment_version }}"
+    thisenv_path: "{{ environments_path }}/{{ environment_type }}/{{ environment_name }}/{{ environment_version }}/env"
+
+- name: Defining a temporary log file for environment creation
+  ansible.builtin.set_fact:
+    create_env_tmpfile: "{{ base_path }}/mamba_create_env.log"
+
+####################################
+# Setup install directories and copy specs
+####################################
+
+# Setup initial directories
+- name: Create required directories
+  become_user: root
+  ansible.builtin.file:
+    path: "{{ base_path }}"
+    state: directory
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rwx,g=rx,o=rx
+
+# Copy environment file
+- name: Copying environment file
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ base_path }}/"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rw,g=r,o=r
+  loop:
+    - "files/{{ condaenv.specs.conda }}"
+    - "files/{{ condaenv.specs.other }}"
+
+####################################
+# Create environment
+####################################
+
+- name: Check micromamba info
+  ansible.builtin.shell:
+    cmd: |
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      mamba info
+    executable: /bin/bash
+  register: debug_out
+
+- name: Print micromamba info
+  ansible.builtin.debug:
+    var: debug_out.stdout_lines
+
+# Create Conda environment
+- name: Create environment
+  ansible.builtin.shell:
+    cmd: >
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      && source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      && umask 022
+      && /usr/bin/time -v mamba -vvv create --quiet --yes -p "{{ thisenv_path }}" -f "{{ base_path }}/{{ condaenv.specs.conda }}" 2>&1 | tee "{{ create_env_tmpfile }}"
+    executable: /bin/bash
+  args:
+    creates: "{{ thisenv_path }}"
+  tags:
+    - conda
+    - trusted
+
+####################################
+# Prepare for installation of non-conda packages
+####################################
+
+# Get non-conda packages
+- name: Load extra package list
+  ansible.builtin.include_vars:
+    file: "{{ base_path }}/{{ condaenv.specs.other }}"
+
+####################################
+# Install extra trusted packages
+####################################
+
+# Install Python packages - trusted - PyPI
+- name: Install trusted Python packages via PyPI
+  ansible.builtin.pip:
+    name: "{{ item if item is string else (item.keys() | first) }}"
+    state: present
+    executable: "{{ thisenv_path }}/bin/pip"
+  loop: "{{ python_packages.trusted.source.pypi }}"
+  when: python_packages.trusted.source.pypi is defined
+  tags:
+    - pypi
+    - trusted
+
+####################################
+# Cleanup
+####################################
+
+- name: Cleanup temporary file
+  ansible.builtin.file:
+    path: "{{ create_env_tmpfile }}"
+    state: absent
+
+####################################
+# Install and link module
+####################################
+
+# Install module
+- name: Install module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ condaenv.info.name }}'"
+          - module_version: "'{{ condaenv.info.version }}'"
+          - module_description: "'{{ condaenv.module.description }}'"
+          - module_help: "'{{ condaenv.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+            - family: [ "condaenv" : quote ]
+            - conflict: [ module_name ]
+      requires:
+        category: "Requires"
+        funcs:
+          - depends_on: [ "'micromamba'" ]
+        cmds:
+          - |
+            execute {
+                cmd = "micromamba activate " .. "{{ thisenv_path }}",
+                modeA = {"load"}
+            }
+          - |
+            execute {
+                cmd = "micromamba deactivate",
+                modeA = {"unload"}
+            }
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/"
+    state: directory
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/{{ environment_version }}.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    state: link
