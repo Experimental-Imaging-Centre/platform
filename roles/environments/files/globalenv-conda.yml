@@ -789,7 +789,7 @@ dependencies:
   - r-startr
   - r-suncalc
   - r-terra
-  - r-tmod
+#  - r-tmod
   - r-transformer
   - r-transphylo
   - r-vegan

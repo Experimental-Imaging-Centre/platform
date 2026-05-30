@@ -315,6 +315,7 @@ r_packages:
         - "SimpleITK/SimpleITKRInstaller": SimpleITK
       # Stats
         - "yohanyee/normtools": normtools
+        - "yohanyee/tmod": tmod # Temporary fix for reading GMT files
   unverified:
     source:
       github:
