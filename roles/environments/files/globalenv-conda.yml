@@ -428,6 +428,8 @@ dependencies:
   - r-stars
   - r-tensora
   - r-xgboost
+# Signal processing
+  - r-gsignal
 # Image and shape processing
   - bioconductor-ebimage
   - r-imager
