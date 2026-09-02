@@ -1,0 +1,7 @@
+---
+
+- import_tasks: "claude-science.yml"
+  tags:
+    - "agents"
+    - "claude"
+    - "claude-science"

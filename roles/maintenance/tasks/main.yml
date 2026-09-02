@@ -1,17 +1,80 @@
 ---
 
-# General maintenance
+#####################################################################
+# General maintenance - run always
+#####################################################################
+
 - import_tasks: check_online.yml
   tags:
     - "maintenance"
     - "check_online"
 
-# Rare mostly one-time things
+- import_tasks: check_users_logged_in.yml
+  tags:
+    - "maintenance"
+    - "check_users_logged_in"
+
+#####################################################################
+# Occasional updates - run as part of maintenance run through
+#####################################################################
+
+- import_tasks: update_hosts.yml
+  tags:
+    - "maintenance"
+    - "update_hosts"
+
+- import_tasks: update_apparmor_profile_bwrap.yml
+  tags:
+    - "maintenance"
+    - "update_apparmor_profile_bwrap"
+
+#####################################################################
+# Occasional updates - run only if requested
+#####################################################################
+
+- import_tasks: apt_update_upgrade.yml
+  tags:
+    - "maintenance"
+    - "apt_update_upgrade"
+    - "never"
+
+- import_tasks: reboot.yml
+  tags:
+    - "maintenance"
+    - "reboot"
+    - "never"
+
+#####################################################################
+# Rare mostly one-time things - security related
+#####################################################################
+
 - import_tasks: patch_copyfail.yml
   tags:
     - "maintenance"
     - "patch_copyfail"
     - "never"
+
+- import_tasks: disable_vulnerable_modules.yml
+  tags:
+    - "maintenance"
+    - "disable_vulnerable_modules"
+    - "never"
+
+- import_tasks: verify_vulnerable_modules_unloaded.yml
+  tags:
+    - "maintenance"
+    - "verify_vulnerable_modules_unloaded"
+    - "never"
+
+- import_tasks: reboot.yml
+  tags:
+    - "maintenance"
+    - "reboot"
+    - "never"
+
+#####################################################################
+# Rare mostly one-time things - software cleaning
+#####################################################################
 
 - import_tasks: uninstall_neuroansible_system_modulepaths.yml
   tags:

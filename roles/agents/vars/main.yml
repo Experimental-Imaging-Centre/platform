@@ -1,0 +1,22 @@
+---
+
+############################
+# Latest package definitions
+############################
+
+claude_science:
+  package:
+    info:
+      name: "claude-science"
+      version: "0.1.41"
+    src:
+      arch: "x64"
+      os: "linux"
+      base_url: "https://downloads.claude.ai/claude-science"
+      checksum: "sha256:7e2df146f0cedc630dce713a05e34a42f791e6e4bbcc97bec0640c6c09dc5372"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "AI workbench for scientists"
+      help: "Claude Science is an app that integrates the tools and packages that researchers most commonly use, produces auditable artifacts, and provides flexible access to computing resources."

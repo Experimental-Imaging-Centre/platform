@@ -1,0 +1,36 @@
+---
+
+####################################
+# Set AppArmor profile to grant userns permissions needed for bwrap
+####################################
+
+- name: Ensure /etc/apparmor.d/local directory exists (for local include)
+  ansible.builtin.file:
+    path: /etc/apparmor.d/local
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+
+- name: Ensure local override include file exists (empty by default)
+  ansible.builtin.file:
+    path: /etc/apparmor.d/local/bwrap
+    state: touch
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    modification_time: preserve
+    access_time: preserve
+
+- name: Deploy AppArmor profile for bwrap
+  ansible.builtin.template:
+    src: templates/bwrap.j2
+    dest: "/etc/apparmor.d/bwrap"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  register: bwrap_profile_file
+
+- name: Reload bwrap apparmor profile
+  ansible.builtin.command: apparmor_parser -r /etc/apparmor.d/bwrap
+  when: bwrap_profile_file is success
