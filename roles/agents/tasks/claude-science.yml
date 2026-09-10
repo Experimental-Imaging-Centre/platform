@@ -69,12 +69,11 @@
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ base_path }}/install"
-    - "{{ base_path }}/install/bin"
 
 - name: Copy the package
   ansible.builtin.copy:
     src: "{{ temp_dir.path }}/{{ package_url | basename }}"
-    dest: "{{ base_path }}/install/bin/claude-science"
+    dest: "{{ base_path }}/install/claude-science"
     owner: "{{ package.owner.user }}"
     group: "{{ package.owner.group }}"
     mode: u=rwx,g=rx,o=rx
@@ -123,7 +122,6 @@
         category: "Paths"
         funcs:
           - prepend_path: [ "'PATH'" , "'{{ base_path }}/install'" ]
-          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
 
 - name: Link module - ensure directory is present
   ansible.builtin.file:

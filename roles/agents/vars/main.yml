@@ -20,3 +20,85 @@ claude_science:
     module:
       description: "AI workbench for scientists"
       help: "Claude Science is an app that integrates the tools and packages that researchers most commonly use, produces auditable artifacts, and provides flexible access to computing resources."
+
+# 1) Get latest version from: https://downloads.claude.ai/claude-code-releases/latest
+# 2) Get manifest for specified version from: https://downloads.claude.ai/claude-code-releases/${version}/manifest.json
+claude_code:
+  package:
+    info:
+      name: "claude-code"
+      version: "2.1.259"
+    src:
+      arch: "x64"
+      os: "linux"
+      base_url: "https://downloads.claude.ai/claude-code-releases"
+      checksum: "sha256:f7dd62ae415378018cd21dd950eb3bac174ab085830304d3b8b098146bfd47b6"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Agentic coding tool from Anthropic"
+      help: "Claude Code is an AI-powered coding assistant that helps build features, fix bugs, and automate development tasks."
+
+# Package list: https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages
+claude_desktop:
+  package:
+    info:
+      name: "claude-desktop"
+      version: "1.46388.2"
+    src:
+      arch: "amd64"
+      base_url: "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop"
+      checksum: "sha256:98bf54e85e4916068c4281459b0f0431d8ff68034773f3ee98311d7206566ab1"
+    depends:
+      - libgtk-3-0
+      - libnotify4
+      - libnss3
+      - xdg-utils
+      - libatspi2.0-0
+      - libdrm2
+      - libgbm1
+      - libxcb-dri3-0
+      - libsecret-1-0
+      - kde-cli-tools
+      - trash-cli
+      - libglib2.0-bin
+      - libc6
+      - libxtst6
+      - libuuid1
+      - xdg-desktop-portal
+      - xdg-desktop-portal-gtk
+      - xdg-desktop-portal-kde
+      - libasound2t64
+      - pulseaudio
+      - libayatana-appindicator3-1
+      - libappindicator3-1
+      - ca-certificates
+      - libkf5wallet-bin
+      - qemu-system-x86
+      - ovmf
+      - virtiofsd
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Desktop application for Claude.ai"
+      help: "Claude Desktop is build around Claude.ai, allowing for seamless integration with local workflows."
+
+antigravity:
+  package:
+    info:
+      name: "antigravity"
+      version: "2.12.2"
+      build: "6298742303883264"
+    src:
+      arch: "x64"
+      os: "linux"
+      base_url: "https://storage.googleapis.com/antigravity-public/antigravity-hub"
+      checksum: "sha256:fc2e2af49a45aefee9558bce56aaa4bbde00d560d354357af1b834a9dd43cd33"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Agentic coding tool from Google"
+      help: "Google Antigravity 2.0 is a dedicated platform to work with agents. Orchestrate multiple autonomous agents working in parallel across independent projects."

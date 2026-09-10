@@ -5,3 +5,20 @@
     - "agents"
     - "claude"
     - "claude-science"
+
+- import_tasks: "claude-code.yml"
+  tags:
+    - "agents"
+    - "claude"
+    - "claude-code"
+
+- import_tasks: "claude-desktop.yml"
+  tags:
+    - "agents"
+    - "claude"
+    - "claude-desktop"
+
+- import_tasks: "antigravity.yml"
+  tags:
+    - "agents"
+    - "antigravity"
