@@ -25,12 +25,13 @@ blender:
   package:
     info:
       name: "blender"
-      version: "5.1.1"
+      version: "5.2.1"
     src:
       arch: "x64"
       os: "linux"
+      series: "5.2"
       base_url: "https://download.blender.org/release"
-      checksum: "sha256:6f9fff89fef154ef7974d1a1c4b916ab4bc1f5618bcb48d5befee1bd0a7c7f2a"
+      checksum: "sha256:a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9"
     owner:
       user: "{{ software_user }}"
       group: "{{ software_user }}"
@@ -178,6 +179,23 @@ spyder:
     module:
       description: "Dependency environment for spyder/6.1.4. Load spyder/6.1.4 to use that service instead."
       help: "A dependency environment for spyder/6.1.4. This is a helper module. You only need to load spyder/6.1.4 to use that service. Do not use this module unless you know what you are doing."
+
+vscode:
+  package:
+    info:
+      name: "vscode"
+      version: "1.137.0"
+    src:
+      arch: "x64"
+      os: "linux"
+      base_url: "https://update.code.visualstudio.com"
+      checksum: "sha256:8871d637292568e34c2d27daa5320a3b3c805f41f94014dfceafbe6134187fce"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Source code editor"
+      help: "Visual Studio Code is a lightweight but powerful source code editor which runs on your desktop. It comes with built-in support for JavaScript, TypeScript and Node.js and has a rich ecosystem of extensions for other languages, runtimes, and debuggers."
 
 ############################
 # Old package definitions

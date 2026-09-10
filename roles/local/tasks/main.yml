@@ -1,5 +1,11 @@
 ---
 
+- import_tasks: "blender.yml"
+  tags:
+    - "local"
+    - "visualization"
+    - "blender"
+
 - import_tasks: "rstudio.yml"
   tags:
     - "local"
@@ -47,3 +53,9 @@
     - "local"
     - "data-management"
     - "aws-cli"
+
+- import_tasks: "vscode.yml"
+  tags:
+    - "local"
+    - "ide"
+    - "vscode"
