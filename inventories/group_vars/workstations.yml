@@ -4,13 +4,16 @@
 platform_name: "PLATFORM"
 
 # Platform paths
+agents_path: /opt/agents
 environments_path: /opt/environments
 local_path: /opt/local
 pipelines_path: /opt/pipelines
 quarantine_path: /opt/quarantine
+services_path: /opt/services
 share_path: /opt/share
 site_path: /opt/site
 cvmfs_path: /cvmfs
+#root_prefix: /opt/share/conda # For conda. Also defined in roles/environments/vars
 
 # Standard paths
 storage_common: /platform/common
@@ -21,9 +24,12 @@ storage_repos: /platform/repos
 
 # Users
 admin_user: admin
+agents_user: agent
 software_user: software
+research_service_servers_user: servers
 cvmfs_user: cvmfs
 
 # Environment variables
 environment:
   APPTAINER_TMPDIR: /scratch
+
