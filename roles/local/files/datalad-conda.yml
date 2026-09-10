@@ -1,0 +1,9 @@
+---
+
+name: datalad
+channels:
+  - conda-forge
+channel_priority: strict
+dependencies:
+  - datalad=1.6.2
+  - git-annex

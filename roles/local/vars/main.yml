@@ -4,6 +4,23 @@
 # Latest package definitions
 ############################
 
+aws_cli:
+  package:
+    info:
+      name: "aws-cli"
+      version: "2.36.43"
+    src:
+      arch: "x86_64"
+      os: "linux"
+      base_url: "https://awscli.amazonaws.com"
+      checksum: "sha256:ef606eb55f9a93ac404cc4a6869c0a791c234b898d93ec6af3bba8c491b391e9"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Unified command line interface for Amazon Web Services"
+      help: "The AWS Command Line Interface (CLI) is a unified tool to manage Amazon Web Services. With one tool, you can control multiple AWS services from the command line and automate them through scripts."
+
 blender:
   package:
     info:
@@ -20,6 +37,31 @@ blender:
     module:
       description: "3D computer graphics software"
       help: "Blender is a free and open-source 3D computer graphics software suite. It is used for general 3D modeling, animation, digital sculpting, visual effects, rendering, compositing, motion tracking, drawing, 2D animation and video editing. It is widely used to create animated films, visual effects, art, 3D-printed models, motion graphics, interactive 3D applications, virtual reality, and 3D models for video games."
+
+datalad:
+  package:
+    info:
+      name: "datalad"
+      version: "1.6.2"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Distributed data management system"
+      help: "DataLad is a free and open source distributed data management system built on top of git and git-annex. It keeps track of your data, creates structure, ensures reproducibility, supports collaboration, and integrates with widely used data infrastructure."
+  condaenv:
+    info:
+      name: "datalad"
+      version: "1.6.2"
+      type: "dependencies"
+    specs:
+      conda: "datalad-conda.yml"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Dependency environment for datalad/1.6.2. Load datalad/1.6.2 to use that service instead."
+      help: "A dependency environment for datalad/1.6.2. This is a helper module. You only need to load datalad/1.6.2 to use that service. Do not use this module unless you know what you are doing."
 
 itksnap:
   package:
@@ -73,6 +115,23 @@ pycharm:
     module:
       description: "IDE for the Python programming language"
       help: "PyCharm is an integrated development environment (IDE) used for programming in Python. It provides code analysis, a graphical debugger, an integrated unit tester, integration with version control systems, and supports web development with Django."
+
+rclone:
+  package:
+    info:
+      name: "rclone"
+      version: "1.75.1"
+    src:
+      arch: "amd64"
+      os: "linux"
+      base_url: "https://downloads.rclone.org"
+      checksum: "sha256:982b5aa772841168f8e380f139e9e787b2a105403e32b94da8676a0e1c0a13ab"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Command-line program for managing files on cloud storage"
+      help: "Rclone is a command-line program to manage files on cloud storage. It is a feature-rich alternative to cloud vendor web storage interfaces. Over 70 cloud storage products support rclone including S3 object stores, business and consumer file storage services, as well as standard transfer protocols."
 
 rstudio:
   package:

@@ -29,3 +29,21 @@
     - "local"
     - "visualization"
     - "itksnap"
+
+- import_tasks: "rclone.yml"
+  tags:
+    - "local"
+    - "data-management"
+    - "rclone"
+
+- import_tasks: "datalad.yml"
+  tags:
+    - "local"
+    - "data-management"
+    - "datalad"
+
+- import_tasks: "aws-cli.yml"
+  tags:
+    - "local"
+    - "data-management"
+    - "aws-cli"

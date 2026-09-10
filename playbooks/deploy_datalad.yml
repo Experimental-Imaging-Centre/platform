@@ -1,0 +1,13 @@
+---
+
+- name: Deploy Datalad
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install Datalad
+      include_role:
+        name: local
+        tasks_from: datalad

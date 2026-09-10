@@ -1,0 +1,259 @@
+--- # datalad
+
+##################################################################################
+# DataLad
+##################################################################################
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure micromamba binary is present"
+  ansible.builtin.import_role:
+    name: environments
+    tasks_from: micromamba.yml
+    vars_from: main.yml
+
+####################################
+# Get variables and set task variables/paths
+####################################
+
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ datalad.package }}"
+    condaenv: "{{ datalad.condaenv }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    environment_name: "{{ condaenv.info.name }}"
+    environment_version: "{{ condaenv.info.version }}"
+    environment_type: "{{ condaenv.info.type }}"
+    base_path: "{{ environments_path }}/{{ condaenv.info.type }}/{{ package.info.name }}/{{ package.info.version }}"
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    install_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
+
+- name: Defining environment path
+  ansible.builtin.set_fact:
+    thisenv_path: "{{ base_path }}/env"
+
+- name: Defining a temporary log file for environment creation
+  ansible.builtin.set_fact:
+    create_env_tmpfile: "{{ base_path }}/mamba_create_env.log"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ thisenv_path }}/bin/datalad"
+    expected_binary_link: "{{ install_path }}/install/bin/datalad"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+- name: Check if expected files exist for idempotency (installed binary link)
+  ansible.builtin.stat:
+    path: "{{ expected_binary_link }}"
+  register: check_exists_expected_binary_link
+
+####################################
+# Setup install directories and copy specs
+####################################
+
+- name: Create required directories
+  ansible.builtin.file:
+    path: "{{ base_path }}"
+    state: directory
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rwx,g=rx,o=rx
+
+- name: Copying environment file
+  ansible.builtin.copy:
+    src: "files/{{ condaenv.specs.conda }}"
+    dest: "{{ base_path }}/"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rw,g=r,o=r
+
+####################################
+# Create environment
+####################################
+
+- name: Check micromamba info
+  ansible.builtin.shell:
+    cmd: |
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      mamba info
+    executable: /bin/bash
+  register: debug_out
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+
+- name: Print micromamba info
+  ansible.builtin.debug:
+    var: debug_out.stdout_lines
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+
+- name: Create environment
+  ansible.builtin.shell:
+    cmd: >
+      export MAMBA_ROOT_PREFIX="{{ root_prefix }}"
+      && source "{{ root_prefix }}/etc/profile.d/mamba.sh"
+      && umask 022
+      && /usr/bin/time -v mamba -vvv create --quiet --yes -p "{{ thisenv_path }}" -f "{{ base_path }}/{{ condaenv.specs.conda }}" 2>&1 | tee "{{ create_env_tmpfile }}"
+    executable: /bin/bash
+  args:
+    creates: "{{ thisenv_path }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+  tags:
+    - conda
+    - trusted
+
+####################################
+# Package install by symlinking binary in
+####################################
+
+- name: Create package install location
+  ansible.builtin.file:
+    path: "{{ install_path }}/install/bin"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Install the package and its required companion binaries
+  ansible.builtin.file:
+    src: "{{ thisenv_path }}/bin/{{ item }}"
+    dest: "{{ install_path }}/install/bin/{{ item }}"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link
+  loop:
+    - "datalad"
+    - "git"
+    - "git-annex"
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_expected_binary_link.stat.exists
+
+####################################
+# Cleanup
+####################################
+
+- name: Cleanup temporary log file
+  ansible.builtin.file:
+    path: "{{ create_env_tmpfile }}"
+    state: absent
+
+####################################
+# Install module
+####################################
+
+- name: Install dependency module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ condaenv.info.name }}'"
+          - module_version: "'{{ condaenv.info.version }}'"
+          - module_description: "'{{ condaenv.module.description }}'"
+          - module_help: "'{{ condaenv.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+            - family: [ "condaenv" : quote ]
+            - conflict: [ module_name ]
+      requires:
+        category: "Requires"
+        funcs:
+          - depends_on: [ "'micromamba'" ]
+      environment:
+        category: "Environment"
+        cmds:
+          - |
+            execute {
+                cmd = "micromamba activate " .. "{{ thisenv_path }}",
+                modeA = {"load"}
+            }
+          - |
+            execute {
+                cmd = "micromamba deactivate",
+                modeA = {"unload"}
+            }
+
+- name: Link dependency module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/"
+    state: directory
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link dependency module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ environments_path }}/modulefiles/{{ environment_type }}/{{ environment_name }}/{{ environment_version }}.lua"
+    owner: "{{ condaenv.owner.user }}"
+    group: "{{ condaenv.owner.group }}"
+    state: link
+
+- name: Install package module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ install_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ install_path }}/install/bin'" ]
+
+- name: Link package module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ local_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link package module - create symlink
+  ansible.builtin.file:
+    src: "{{ install_path }}/module.lua"
+    dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link
