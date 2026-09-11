@@ -22,3 +22,9 @@
   tags:
     - "agents"
     - "antigravity"
+
+- import_tasks: "wikijs-mcp.yml"
+  tags:
+    - "agents"
+    - "mcp"
+    - "wikijs-mcp"

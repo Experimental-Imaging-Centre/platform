@@ -1,0 +1,54 @@
+--- # wikijs-mcp
+
+##################################################################################
+# WikiJS MCP server (installed globally via pipx)
+##################################################################################
+
+####################################
+# Satisfy dependencies
+####################################
+
+- name: "Run dependency tasks: ensure pipx is present"
+  ansible.builtin.import_role:
+    name: environments
+    tasks_from: pipx
+
+####################################
+# Get/set vars
+####################################
+
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ wikijs_mcp.package }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    pipx_binary: "{{ share_path }}/software/{{ pipx.package.info.name }}/{{ pipx.package.info.version }}/install/bin/pipx"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ pipx_global_home }}/bin/{{ package_name }}"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+####################################
+# Install package
+####################################
+
+- name: Install the MCP server globally via pipx
+  ansible.builtin.shell:
+    cmd: >
+      export PIPX_GLOBAL_HOME="{{ pipx_global_home }}"
+      && export PIPX_GLOBAL_BIN_DIR="{{ pipx_global_home }}/bin"
+      && export PIPX_GLOBAL_MAN_DIR="{{ pipx_global_home }}/share/man"
+      && {{ pipx_binary }} install --global "{{ package_name }}=={{ package_version }}"
+    executable: /bin/bash
+  args:
+    creates: "{{ expected_binary }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
