@@ -5,6 +5,16 @@
     - "environment"
     - "micromamba"
 
+- import_tasks: pipx.yml
+  tags:
+    - "environment"
+    - "pipx"
+
+- import_tasks: uv.yml
+  tags:
+    - "environment"
+    - "uv"
+
 - import_tasks: globalenv.yml
   tags:
     - "environment"

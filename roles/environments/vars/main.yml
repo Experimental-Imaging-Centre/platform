@@ -8,15 +8,46 @@
 micromamba:
   package:
     info:
-      name: micromamba
-      version: 2.5.0
-      arch: linux-64
+      name: "micromamba"
+      version: "2.5.0"
+      arch: "linux-64"
     owner:
       user: "{{ software_user }}"
       group: "{{ software_user }}"
     module:
       description: "CLI tool to manage conda environments"
       help: "Micromamba is a tiny, incredibly fast, and fully self-contained version of the mamba package manager. Packaged as a single C++ executable, it requires no base environment, has no pre-installed Python, and is a drop-in, lightweight alternative to standard conda."
+
+pipx:
+  package:
+    info:
+      name: "pipx"
+      version: "1.17.2"
+    src:
+      url: "https://files.pythonhosted.org/packages/a1/60/0af16a54fca9f92ed244291a6458046508f4f4821e561c16f335a8473107/pipx-1.17.2-py3-none-any.whl"
+      checksum: "sha256:3d4962feb270c778426820c4bd79f5faf20979c512c2f3832b932207b192eda0"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Install and run Python applications in isolated environments"
+      help: "pipx is a tool to install and run end-user Python applications in isolated environments, without polluting the system or user site-packages. Each application gets its own virtual environment, while the application command-line entry points are made available on PATH."
+
+uv:
+  package:
+    info:
+      name: "uv"
+      version: "0.12.13"
+    src:
+      arch: "x86_64-unknown-linux-gnu"
+      base_url: "https://github.com/astral-sh/uv/releases/download"
+      checksum: "sha256:745765a3b6e360ad76743599ae5c42e9278c7edf8bbff9fc76d05bf2623a04dd"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Extremely fast Python package and project manager"
+      help: "uv is an extremely fast Python package and project manager, written in Rust. It can replace pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more, acting as a drop-in, much faster alternative to the standard tooling."
 
 ############################
 # Mamba vars
@@ -41,6 +72,18 @@ root_prefix_condarc:
 packages:
   - mamba=2.5.0
   - python=3.11
+
+############################
+# Pipx vars
+############################
+
+pipx_global_home: /opt/share/pipx
+
+############################
+# uv vars
+############################
+
+uv_global_cache: /opt/share/uv
 
 ############################
 # Build vars
