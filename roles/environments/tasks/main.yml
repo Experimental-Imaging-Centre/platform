@@ -15,6 +15,11 @@
     - "environment"
     - "uv"
 
+- import_tasks: node_npm.yml
+  tags:
+    - "environment"
+    - "node-npm"
+
 - import_tasks: globalenv.yml
   tags:
     - "environment"

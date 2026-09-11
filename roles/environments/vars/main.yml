@@ -49,6 +49,22 @@ uv:
       description: "Extremely fast Python package and project manager"
       help: "uv is an extremely fast Python package and project manager, written in Rust. It can replace pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more, acting as a drop-in, much faster alternative to the standard tooling."
 
+node_npm:
+  package:
+    info:
+      name: "node-npm"
+      version: "24.21.0"
+    src:
+      arch: "x64"
+      base_url: "https://nodejs.org/dist"
+      checksum: "sha256:fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "JavaScript runtime and package manager (Node.js + npm)"
+      help: "Node.js is a JavaScript runtime built on the V8 engine, bundled here together with npm (the Node.js package manager) and npx (a tool for executing npm package binaries)."
+
 ############################
 # Mamba vars
 ############################
@@ -84,6 +100,12 @@ pipx_global_home: /opt/share/pipx
 ############################
 
 uv_global_cache: /opt/share/uv
+
+############################
+# npm vars
+############################
+
+npm_global_prefix: /opt/share/npm
 
 ############################
 # Build vars
