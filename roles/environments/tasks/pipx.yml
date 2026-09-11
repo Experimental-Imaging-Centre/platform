@@ -42,8 +42,8 @@
     mode: u=rwX,g=rX,o=rX
   loop:
     - "{{ base_path }}/install"
-    - "{{ base_path }}/install/share/man"
-    - "{{ pipx_global_home }}"
+    - "{{ pipx_global_home }}/bin"
+    - "{{ pipx_global_home }}/share/man"
 
 ####################################
 # Download package
@@ -128,8 +128,8 @@
         category: "Environment"
         funcs:
           - setenv: [ "'PIPX_GLOBAL_HOME'" , "'{{ pipx_global_home }}'" ]
-          - setenv: [ "'PIPX_GLOBAL_BIN_DIR'" , "'{{ base_path }}/install/bin'" ]
-          - setenv: [ "'PIPX_GLOBAL_MAN_DIR'" , "'{{ base_path }}/install/share/man'" ]
+          - setenv: [ "'PIPX_GLOBAL_BIN_DIR'" , "'{{ pipx_global_home }}/bin'" ]
+          - setenv: [ "'PIPX_GLOBAL_MAN_DIR'" , "'{{ pipx_global_home }}/share/man'" ]
           - setenv: [ "'PIPX_HOME'" , "pathJoin(os.getenv(\"HOME\"), \".local/share/pipx\")" ]
           - setenv: [ "'PIPX_BIN_DIR'" , "pathJoin(os.getenv(\"HOME\"), \".local/bin\")" ]
           - setenv: [ "'PIPX_MAN_DIR'" , "pathJoin(os.getenv(\"HOME\"), \".local/share/man\")" ]
@@ -137,7 +137,8 @@
         category: "Paths"
         funcs:
           - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
-          - prepend_path: [ "'MANPATH'" , "'{{ base_path }}/install/share/man'" ]
+          - prepend_path: [ "'PATH'" , "'{{ pipx_global_home }}/bin'" ]
+          - prepend_path: [ "'MANPATH'" , "'{{ pipx_global_home }}/share/man'" ]
           - prepend_path: [ "'MANPATH'" , "pathJoin(os.getenv(\"HOME\"), \".local/share/man\")" ]
 
 - name: Link module - ensure directory is present
