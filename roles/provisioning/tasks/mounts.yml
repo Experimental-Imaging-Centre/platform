@@ -1,0 +1,41 @@
+--- # Mount remote filesystems
+
+- name: Install NFS/CIFS client packages
+  ansible.builtin.apt:
+    state: present
+    pkg:
+      - nfs-common
+      - cifs-utils
+
+- name: Deploy CIFS mount credentials
+  ansible.builtin.copy:
+    src: "{{ cifs_credentials_file }}"
+    dest: "/etc/samba/{{ cifs_credentials_file }}"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: Ensure mountpoint directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ mount_points }}"
+
+- name: Add remote filesystem mounts to /etc/fstab
+  ansible.builtin.blockinfile:
+    path: /etc/fstab
+    block: "{{ lookup('template', 'fstab.j2') }}"
+    marker: "# {mark} ANSIBLE MANAGED MOUNTS BLOCK"
+
+- name: Reload systemd daemon after fstab change
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Mount all filesystems in fstab
+  ansible.builtin.command:
+    cmd: mount -a
+  changed_when: false

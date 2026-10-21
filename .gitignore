@@ -1,0 +1,4 @@
+# platform/ is public on GitHub -- never allow credential files to be
+# accidentally tracked (e.g. if a symlink into keys/ is ever replaced with
+# a real file by mistake). See CLAUDE.md's "platform/ is public" section.
+credentials-*
