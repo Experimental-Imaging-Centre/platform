@@ -6,6 +6,18 @@
     - "visualization"
     - "blender"
 
+- import_tasks: "brkraw.yml"
+  tags:
+    - "local"
+    - "data-management"
+    - "brkraw"
+
+- import_tasks: "pvraw.yml"
+  tags:
+    - "local"
+    - "data-management"
+    - "pvraw"
+
 - import_tasks: "rstudio.yml"
   tags:
     - "local"

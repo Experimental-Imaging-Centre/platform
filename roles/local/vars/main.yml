@@ -21,6 +21,21 @@ aws_cli:
       description: "Unified command line interface for Amazon Web Services"
       help: "The AWS Command Line Interface (CLI) is a unified tool to manage Amazon Web Services. With one tool, you can control multiple AWS services from the command line and automate them through scripts."
 
+brkraw:
+  package:
+    info:
+      name: "brkraw"
+      version: "0.5.7"
+    src:
+      url: "https://files.pythonhosted.org/packages/6a/9a/33474a9275326dd4f53c419abbf27b8cd85daa6e1fc5e1d9cf105ee225e7/brkraw-0.5.7-py3-none-any.whl"
+      checksum: "sha256:24f72f87a5b2b2f24aacc51bb75b12d3b96f3f55337d27cdbf7aa97820717fed"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Toolkit for Bruker ParaVision datasets"
+      help: "BrkRaw is a toolkit for loading Bruker ParaVision datasets, mapping metadata, and exporting NIfTI."
+
 blender:
   package:
     info:
@@ -99,6 +114,21 @@ positron:
     module:
       description: "IDE for R and Python programming languages"
       help: "Positron is an IDE built for Python and R. It combines the power of a full-featured IDE with interactive data science tools for Python and R."
+
+pvraw:
+  package:
+    info:
+      name: "pvraw"
+      version: "1.1.1"
+    src:
+      url: "https://files.pythonhosted.org/packages/7b/fb/7ffbcd370e70451f506a60326bb15f44346b8d348540d1d5de7d48cd0774/pvraw-1.1.1-py3-none-any.whl"
+      checksum: "sha256:88bda3bdc4d5af9dbda213d02910444c3146f1e9c978351c9023932395a30c6b"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Read raw Bruker ParaVision MRI data"
+      help: "pvraw reads raw Bruker ParaVision MRI data and converts it to NIfTI or BIDS."
 
 pycharm:
   package:
@@ -200,6 +230,43 @@ vscode:
 ############################
 # Old package definitions
 ############################
+
+brkraw_0_6_1rc2:
+  package:
+    info:
+      name: "brkraw"
+      version: "0.6.1rc2"
+    src:
+      # Not on PyPI -- GitHub pre-release only. No published checksum exists;
+      # pinned to the exact commit the 0.6.1rc2 tag resolved to (2026-10-20),
+      # since tags are mutable but commits aren't. Installing this version
+      # requires a different mechanism than the PyPI-wheel one brkraw.yml
+      # currently implements (pip install from this git_url pinned at
+      # git_ref, not a downloaded/checksummed wheel) -- not wired into any
+      # task; kept here purely as a record.
+      git_url: "https://github.com/BrkRaw/brkraw.git"
+      git_ref: "ca7ee89ced62553d4c5b7a1ca88d66e55948b44a"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Toolkit for Bruker ParaVision datasets (pre-release)"
+      help: "BrkRaw is a toolkit for loading Bruker ParaVision datasets, mapping metadata, and exporting NIfTI."
+
+brkraw_0_3_11:
+  package:
+    info:
+      name: "brkraw"
+      version: "0.3.11"
+    src:
+      url: "https://files.pythonhosted.org/packages/99/9e/913b233963ac0b436d1dd676bc359025706c91e948e2a70e7a7159e702be/brkraw-0.3.11-py3-none-any.whl"
+      checksum: "sha256:32fdb04039f00a6ecd29b359c474cf08cc00aaedac3b377d5c46cbe662998504"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Toolkit for Bruker ParaVision datasets (bids_helper, legacy)"
+      help: "BrkRaw is a toolkit for loading Bruker ParaVision datasets, mapping metadata, and exporting NIfTI. This is the last version before the bids_helper subcommand was dropped in 0.5.0; kept as a record, not deployed."
 
 rstudio_2026_01_1_403:
   package:

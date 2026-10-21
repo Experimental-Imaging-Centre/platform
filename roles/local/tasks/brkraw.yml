@@ -1,0 +1,130 @@
+--- # brkraw
+
+##################################################################################
+# BrkRaw
+##################################################################################
+
+####################################
+# Get vars and set paths
+####################################
+
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ brkraw.package }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    package_url: "{{ package.src.url }}"
+    package_checksum: "{{ package.src.checksum }}"
+    base_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ base_path }}/install/bin/brkraw"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+####################################
+# Download package
+####################################
+
+- name: Create temporary directory to download the wheel
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: build
+  register: temp_dir
+  when:
+    - not check_exists_expected_binary.stat.exists
+
+- name: Download brkraw wheel with SHA256 verification
+  ansible.builtin.get_url:
+    url: "{{ package_url }}"
+    dest: "{{ temp_dir.path }}/{{ package_url | basename }}"
+    checksum: "{{ package_checksum }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+
+####################################
+# Create isolated venv and install package
+####################################
+
+- name: Create isolated virtual environment
+  ansible.builtin.command:
+    cmd: "python3 -m venv {{ base_path }}/install"
+  args:
+    creates: "{{ base_path }}/install/bin/python3"
+  when:
+    - not check_exists_expected_binary.stat.exists
+
+- name: Install brkraw from the verified wheel (dependencies resolved online by pip)
+  ansible.builtin.command:
+    cmd: >
+      {{ base_path }}/install/bin/pip install
+      "{{ temp_dir.path }}/{{ package_url | basename }}"
+  args:
+    creates: "{{ expected_binary }}"
+  when:
+    - not check_exists_expected_binary.stat.exists
+
+####################################
+# Cleanup
+####################################
+
+- name: Cleanup temporary directory
+  ansible.builtin.file:
+    path: "{{ temp_dir.path }}"
+    state: absent
+  when: temp_dir.path is defined
+
+####################################
+# Install module
+####################################
+
+- name: Install module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ local_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link
