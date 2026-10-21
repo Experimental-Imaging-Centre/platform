@@ -21,3 +21,18 @@
       - python3
       - python3-pip
       - python3-venv
+
+# Productivity tools
+- name: Install productivity tools through apt
+  ansible.builtin.apt:
+    update_cache: yes
+    state: latest
+    autoclean: yes
+    autoremove: yes
+    pkg:
+      - gimp
+      - inkscape
+      - krita
+      - scribus
+      - xournalpp
+      - tmux
