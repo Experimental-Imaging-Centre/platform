@@ -97,6 +97,23 @@ itksnap:
       description: "Medical image viewer and segmentation tool"
       help: "ITK-SNAP is an interactive software application that allows users to navigate three-dimensional medical images, manually delineate anatomical regions of interest, and perform automatic image segmentation. The software was designed with the audience of clinical and basic science researchers in mind, and emphasis has been placed on having a user-friendly interface and maintaining a limited feature set to prevent feature creep. ITK-SNAP is most frequently used to work with magnetic resonance imaging (MRI), cone-beam computed tomography (CBCT) and computed tomography (CT) data sets."
 
+matlab:
+  package:
+    info:
+      name: "matlab"
+      version: "R2024b"
+    src:
+      path: "{{ software_source_root }}/MATLAB/R2024b"
+      iso: "R2024b_Linux.iso"
+      file_installation_key: "FileInstallationKey_R2024b.txt"
+      license_file: "network.lic"
+    owner:
+      user: "{{ software_user }}"
+      group: "{{ software_user }}"
+    module:
+      description: "Numerical computing environment and programming language"
+      help: "MATLAB is a programming and numeric computing platform used for data analysis, visualization, and algorithm development."
+
 positron:
   package:
     info:

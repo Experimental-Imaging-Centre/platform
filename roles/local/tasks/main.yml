@@ -71,3 +71,9 @@
     - "local"
     - "ide"
     - "vscode"
+
+- import_tasks: "matlab.yml"
+  tags:
+    - "local"
+    - "computing"
+    - "matlab"

@@ -1,0 +1,210 @@
+--- # MATLAB
+
+##################################################################################
+# MATLAB
+##################################################################################
+
+####################################
+# Get vars and set paths
+####################################
+
+- name: Get package information
+  ansible.builtin.set_fact:
+    package: "{{ matlab.package }}"
+
+- name: Set task variables
+  ansible.builtin.set_fact:
+    package_name: "{{ package.info.name }}"
+    package_version: "{{ package.info.version }}"
+    package_source_path: "{{ package.src.path }}"
+    base_path: "{{ local_path }}/software/{{ package.info.name }}/{{ package.info.version }}"
+
+- name: Set expected paths
+  ansible.builtin.set_fact:
+    expected_binary: "{{ base_path }}/install/bin/matlab"
+
+- name: Check if expected files exist for idempotency (binary)
+  ansible.builtin.stat:
+    path: "{{ expected_binary }}"
+  register: check_exists_expected_binary
+
+####################################
+# Verify installation media is reachable on the control node
+####################################
+
+- name: Check that the installation media is reachable on the control node
+  ansible.builtin.stat:
+    path: "{{ package_source_path }}/{{ package.src.iso }}"
+  delegate_to: localhost
+  become: false
+  register: check_exists_source_iso
+  when:
+    - not check_exists_expected_binary.stat.exists
+
+- name: Fail early if installation media is not reachable on the control node
+  ansible.builtin.fail:
+    msg: >-
+      {{ package_source_path }}/{{ package.src.iso }} does not exist on the
+      Ansible control node.
+  when:
+    - not check_exists_expected_binary.stat.exists
+    - not check_exists_source_iso.stat.exists
+
+####################################
+# Copy installation media to the workstation, run the non-interactive
+# installer, then clean up
+####################################
+
+- name: Copy installation media to the workstation, install MATLAB, and clean up
+  become_user: root
+  when:
+    - not check_exists_expected_binary.stat.exists
+  block:
+    - name: Create temporary directory for installation media on the workstation
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: matlab-media
+      register: media_dir
+
+    - name: Create package install location
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ package.owner.user }}"
+        group: "{{ package.owner.group }}"
+        mode: u=rwX,g=rX,o=rX
+      loop:
+        - "{{ base_path }}/install"
+
+    - name: Copy installation ISO to the workstation
+      ansible.builtin.copy:
+        src: "{{ package_source_path }}/{{ package.src.iso }}"
+        dest: "{{ media_dir.path }}/{{ package.src.iso }}"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Copy network license file to the workstation
+      ansible.builtin.copy:
+        src: "{{ package_source_path }}/{{ package.src.license_file }}"
+        dest: "{{ media_dir.path }}/{{ package.src.license_file }}"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Create temporary mountpoint for installation media
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: matlab-iso
+      register: iso_mountpoint
+
+    - name: Mount installation media (read-only loopback)
+      ansible.builtin.command:
+        cmd: "mount -o loop,ro {{ media_dir.path }}/{{ package.src.iso }} {{ iso_mountpoint.path }}"
+      changed_when: true
+
+    - name: Create temporary directory for the installer input file
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: matlab-installer-input
+      register: installer_input_dir
+
+    # Uses MathWorks' -inputFile mechanism rather than passing
+    # fileInstallationKey/licensePath as command-line flags to avoid
+    # CLI flags exposing the plaintext installation key via `ps aux`.
+    # Also use no_log for this same reason.
+    - name: Write non-interactive installer input file
+      ansible.builtin.copy:
+        dest: "{{ installer_input_dir.path }}/installer_input.txt"
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          mode=silent
+          destinationFolder={{ base_path }}/install
+          agreeToLicense=yes
+          outputFile=/tmp/matlab_install_{{ package_version }}.log
+          fileInstallationKey={{ lookup('file', package_source_path + '/' + package.src.file_installation_key) }}
+          licensePath={{ media_dir.path }}/{{ package.src.license_file }}
+      no_log: true
+
+    - name: Run non-interactive MATLAB installer
+      ansible.builtin.command:
+        cmd: "{{ iso_mountpoint.path }}/install -inputFile {{ installer_input_dir.path }}/installer_input.txt"
+      args:
+        creates: "{{ expected_binary }}"
+      no_log: true
+
+  always:
+    - name: Remove installer input file (contains the plaintext installation key)
+      ansible.builtin.file:
+        path: "{{ installer_input_dir.path }}"
+        state: absent
+      when: installer_input_dir is defined and installer_input_dir.path is defined
+
+    - name: Unmount installation media
+      ansible.builtin.command:
+        cmd: "umount {{ iso_mountpoint.path }}"
+      when: iso_mountpoint is defined and iso_mountpoint.path is defined
+      failed_when: false
+      changed_when: true
+
+    - name: Remove temporary mountpoint
+      ansible.builtin.file:
+        path: "{{ iso_mountpoint.path }}"
+        state: absent
+      when: iso_mountpoint is defined and iso_mountpoint.path is defined
+
+    - name: Remove copied installation media from the workstation
+      ansible.builtin.file:
+        path: "{{ media_dir.path }}"
+        state: absent
+      when: media_dir is defined and media_dir.path is defined
+
+####################################
+# Install module
+####################################
+
+- name: Install module
+  ansible.builtin.template:
+    src: templates/modulefile.j2
+    dest: "{{ base_path }}/module.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rw,g=r,o=r
+  vars:
+    module:
+      module:
+        category: "Module"
+        vars:
+          - module_name: "'{{ package.info.name }}'"
+          - module_version: "'{{ package.info.version }}'"
+          - module_description: "'{{ package.module.description }}'"
+          - module_help: "'{{ package.module.help }}'"
+        funcs:
+          - whatis: [ module_description ]
+          - help: [ module_help ]
+      conflicts:
+        category: "Conflicts"
+        funcs:
+          - conflict: [ module_name ]
+      paths:
+        category: "Paths"
+        funcs:
+          - prepend_path: [ "'PATH'" , "'{{ base_path }}/install/bin'" ]
+
+- name: Link module - ensure directory is present
+  ansible.builtin.file:
+    path: "{{ local_path }}/modulefiles/{{ package_name }}/"
+    state: directory
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    mode: u=rwX,g=rX,o=rX
+
+- name: Link module - create symlink
+  ansible.builtin.file:
+    src: "{{ base_path }}/module.lua"
+    dest: "{{ local_path }}/modulefiles/{{ package_name }}/{{ package_version }}.lua"
+    owner: "{{ package.owner.user }}"
+    group: "{{ package.owner.group }}"
+    state: link
