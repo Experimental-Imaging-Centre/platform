@@ -1,0 +1,13 @@
+---
+
+- name: Deploy claude-desktop
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install claude-desktop
+      include_role:
+        name: agents
+        tasks_from: "claude-desktop"

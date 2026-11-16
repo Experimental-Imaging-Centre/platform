@@ -1,0 +1,17 @@
+---
+
+# See: https://ubuntu.com/blog/copy-fail-vulnerability-fixes-available
+- name: Update apt and upgrade
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update apt, upgrade, and reboot
+      include_role:
+        name: maintenance
+        tasks_from: "{{ item }}"
+      loop:
+        - apt_update_upgrade
+        - reboot

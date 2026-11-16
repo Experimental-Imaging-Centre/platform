@@ -1,0 +1,15 @@
+---
+
+- name: Uninstall neuroansible-installed conda software and modules
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Uninstall neuroansible-installed conda software and modules
+      include_role:
+        name: maintenance
+        tasks_from: uninstall_neuroansible_conda_software
+
+

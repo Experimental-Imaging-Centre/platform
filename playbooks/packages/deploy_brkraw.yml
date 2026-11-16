@@ -1,0 +1,13 @@
+---
+
+- name: Deploy brkraw
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install brkraw
+      include_role:
+        name: local
+        tasks_from: brkraw

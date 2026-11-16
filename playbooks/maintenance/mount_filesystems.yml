@@ -1,0 +1,13 @@
+---
+
+- name: Deploy remote filesystem mounts
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Mount remote filesystems
+      include_role:
+        name: provisioning
+        tasks_from: mounts

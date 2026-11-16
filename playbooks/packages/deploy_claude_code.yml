@@ -1,0 +1,25 @@
+---
+
+- name: Update apparmor profile
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update apparmor profile for bubblewrap
+      include_role:
+        name: maintenance
+        tasks_from: "update_apparmor_profile_bwrap"
+
+- name: Deploy claude-code
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install claude-code
+      include_role:
+        name: agents
+        tasks_from: "claude-code"

@@ -1,0 +1,13 @@
+---
+
+- name: Deploy globalenv
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: "{{ software_user }}"
+  become_method: sudo
+  tasks:
+    - name: Install globalenv
+      include_role:
+        name: environments
+        tasks_from: globalenv

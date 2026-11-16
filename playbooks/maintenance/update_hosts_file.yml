@@ -1,0 +1,16 @@
+---
+
+- name: Update hosts
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Update hosts
+      include_role:
+        name: maintenance
+        tasks_from: update_hosts
+
+
+

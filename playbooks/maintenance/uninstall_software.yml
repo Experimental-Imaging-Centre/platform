@@ -1,0 +1,16 @@
+---
+
+- name: Uninstall software
+  hosts: workstations
+  remote_user: "{{ admin_user }}"
+  become: true
+  become_user: root
+  become_method: sudo
+  tasks:
+    - name: Uninstall software
+      include_role:
+        name: maintenance
+        tasks_from: uninstall_software
+
+
+
